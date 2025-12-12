@@ -12,6 +12,7 @@ use Laravilt\Auth\Drivers\EmailDriver;
 use Laravilt\Auth\Drivers\SocialProviders\GitHubProvider;
 use Laravilt\Auth\Drivers\SocialProviders\GoogleProvider;
 use Laravilt\Auth\Drivers\TotpDriver;
+use Laravilt\Panel\FontProviders\GoogleFontProvider;
 use Laravilt\Panel\Panel;
 use Laravilt\Panel\PanelProvider;
 
@@ -25,7 +26,12 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->brandName('Admin')
+            ->default()
+            ->brandName("Laravilt")
+            ->font(
+                GoogleFontProvider::make('IBM Plex Sans Arabic')
+                    ->weights([400, 500, 600, 700])
+            )
             ->discoverAutomatically()
             ->login()
             ->registration()
