@@ -37,7 +37,8 @@ return [
     */
 
     'colors' => [
-        'primary' => '#6366f1', // Indigo
+        'primary' => '#04bdaf', // Teal (from logo)
+        'secondary' => '#822478', // Purple (from logo)
     ],
 
     /*

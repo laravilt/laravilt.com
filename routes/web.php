@@ -9,6 +9,7 @@ Route::get('/', [LandingController::class, 'index'])->name('home');
 
 // Documentation
 Route::get('/docs', [DocumentationController::class, 'index'])->name('docs.index');
+Route::get('/docs/search', [DocumentationController::class, 'search'])->name('docs.search');
 Route::get('/docs/{page}', [DocumentationController::class, 'show'])
     ->where('page', '.*')
     ->name('docs.show');

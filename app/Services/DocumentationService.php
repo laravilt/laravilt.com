@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\File;
+use App\Models\Documentation;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -13,14 +15,13 @@ use Spatie\YamlFrontMatter\YamlFrontMatter;
 
 class DocumentationService
 {
-    protected string $docsPath;
     protected MarkdownConverter $converter;
+    protected string $repo = 'laravilt/laravilt';
+    protected string $branch = 'master';
+    protected string $docsPath = 'docs';
 
     public function __construct()
     {
-        // Point to the docs folder in the main laravilt repo
-        $this->docsPath = base_path('../laravilt/packages/laravilt/laravilt/docs');
-
         $config = [
             'heading_permalink' => [
                 'html_class' => 'heading-permalink',
@@ -53,31 +54,181 @@ class DocumentationService
         $this->converter = new MarkdownConverter($environment);
     }
 
+    /**
+     * Get documentation page by path.
+     */
     public function get(string $path): ?array
     {
-        $filePath = $this->docsPath . '/' . $path . '.md';
+        $doc = Documentation::where('path', $path)->first();
 
-        if (!File::exists($filePath)) {
-            // Try README.md in directory
-            $filePath = $this->docsPath . '/' . $path . '/README.md';
-            if (!File::exists($filePath)) {
-                return null;
-            }
+        if (!$doc) {
+            // Try with README suffix
+            $doc = Documentation::where('path', $path . '/README')->first();
         }
 
-        $content = File::get($filePath);
-        $document = YamlFrontMatter::parse($content);
-
-        $html = $this->converter->convert($document->body())->getContent();
+        if (!$doc) {
+            return null;
+        }
 
         return [
-            'title' => $document->matter('title') ?? $this->extractTitle($document->body()),
-            'description' => $document->matter('description'),
-            'html' => $html,
-            'editUrl' => 'https://github.com/laravilt/laravilt/edit/main/docs/' . $path . '.md',
+            'title' => $doc->title,
+            'description' => $doc->description,
+            'html' => $doc->content_html,
+            'editUrl' => $doc->edit_url,
         ];
     }
 
+    /**
+     * Search documentation.
+     */
+    public function search(string $query): array
+    {
+        return Documentation::search($query)
+            ->select(['path', 'title', 'description'])
+            ->limit(20)
+            ->get()
+            ->map(fn ($doc) => [
+                'path' => $doc->path,
+                'title' => $doc->title,
+                'description' => $doc->description,
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Sync documentation from GitHub.
+     */
+    public function syncFromGithub(): array
+    {
+        $synced = [];
+        $files = $this->getDocsFilesFromGithub();
+
+        foreach ($files as $file) {
+            if (!str_ends_with($file['path'], '.md')) {
+                continue;
+            }
+
+            $relativePath = str_replace($this->docsPath . '/', '', $file['path']);
+            $relativePath = str_replace('.md', '', $relativePath);
+
+            // Fetch file content
+            $content = $this->fetchFileContent($file['path'], $file['sha']);
+
+            if ($content) {
+                $this->saveDocumentation($relativePath, $content, $file['sha']);
+                $synced[] = $relativePath;
+            }
+        }
+
+        // Clear cache after sync
+        Cache::forget('docs_navigation');
+
+        return $synced;
+    }
+
+    /**
+     * Get all markdown files from GitHub docs folder.
+     */
+    protected function getDocsFilesFromGithub(): array
+    {
+        $files = [];
+        $this->fetchGithubTree($this->docsPath, $files);
+        return $files;
+    }
+
+    /**
+     * Recursively fetch files from GitHub tree.
+     */
+    protected function fetchGithubTree(string $path, array &$files): void
+    {
+        $url = "https://api.github.com/repos/{$this->repo}/contents/{$path}?ref={$this->branch}";
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/vnd.github.v3+json',
+            'User-Agent' => 'Laravilt-Docs',
+        ])->get($url);
+
+        if (!$response->successful()) {
+            return;
+        }
+
+        foreach ($response->json() as $item) {
+            if ($item['type'] === 'file' && str_ends_with($item['name'], '.md')) {
+                $files[] = [
+                    'path' => $item['path'],
+                    'sha' => $item['sha'],
+                ];
+            } elseif ($item['type'] === 'dir') {
+                $this->fetchGithubTree($item['path'], $files);
+            }
+        }
+    }
+
+    /**
+     * Fetch file content from GitHub.
+     */
+    protected function fetchFileContent(string $path, string $sha): ?string
+    {
+        // Check if we already have this version
+        $existing = Documentation::where('sha', $sha)->first();
+        if ($existing) {
+            return null; // Already up to date
+        }
+
+        $url = "https://raw.githubusercontent.com/{$this->repo}/{$this->branch}/{$path}";
+
+        $response = Http::withHeaders([
+            'User-Agent' => 'Laravilt-Docs',
+        ])->get($url);
+
+        if (!$response->successful()) {
+            return null;
+        }
+
+        return $response->body();
+    }
+
+    /**
+     * Save documentation to database.
+     */
+    protected function saveDocumentation(string $path, string $content, string $sha): void
+    {
+        $title = $this->extractTitle($content);
+        $description = null;
+        $body = $content;
+        $order = 0;
+
+        // Try to parse YAML frontmatter if it exists
+        if (str_starts_with(trim($content), '---')) {
+            try {
+                $document = YamlFrontMatter::parse($content);
+                $title = $document->matter('title') ?? $this->extractTitle($document->body());
+                $description = $document->matter('description');
+                $body = $document->body();
+                $order = $document->matter('order') ?? 0;
+            } catch (\Exception $e) {
+                // Frontmatter parsing failed, use raw content
+            }
+        }
+
+        $html = $this->converter->convert($body)->getContent();
+
+        Documentation::updateOrCreate(
+            ['path' => $path],
+            [
+                'title' => $title,
+                'description' => $description,
+                'content_raw' => $body,
+                'content_html' => $html,
+                'sha' => $sha,
+                'order' => $order,
+            ]
+        );
+    }
+
+    /**
+     * Extract title from markdown content.
+     */
     protected function extractTitle(string $content): string
     {
         if (preg_match('/^#\s+(.+)$/m', $content, $matches)) {
@@ -86,136 +237,93 @@ class DocumentationService
         return 'Documentation';
     }
 
+    /**
+     * Get navigation structure.
+     */
     public function getNavigation(): array
     {
-        return [
-            [
-                'title' => 'Getting Started',
-                'items' => [
-                    ['title' => 'Introduction', 'path' => 'getting-started/README'],
-                    ['title' => 'Installation', 'path' => 'getting-started/installation'],
-                    ['title' => 'Quick Start', 'path' => 'getting-started/quick-start'],
-                    ['title' => 'Directory Structure', 'path' => 'getting-started/directory-structure'],
-                    ['title' => 'Configuration', 'path' => 'getting-started/configuration'],
+        return Cache::remember('docs_navigation', 3600, function () {
+            return [
+                [
+                    'title' => 'Getting Started',
+                    'items' => $this->getNavItems(['getting-started/installation', 'getting-started/quick-start', 'getting-started/architecture']),
                 ],
-            ],
-            [
-                'title' => 'Core Concepts',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'core-concepts/README'],
-                    ['title' => 'Architecture', 'path' => 'core-concepts/architecture'],
-                    ['title' => 'Type Safety', 'path' => 'core-concepts/type-safety'],
-                    ['title' => 'Frontend Integration', 'path' => 'core-concepts/frontend-integration'],
+                [
+                    'title' => 'Panel',
+                    'items' => $this->getNavItems(['panel/introduction', 'panel/creating-panels', 'panel/navigation', 'panel/resources', 'panel/pages', 'panel/themes']),
                 ],
-            ],
-            [
-                'title' => 'Panel',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'panel/README'],
-                    ['title' => 'Configuration', 'path' => 'panel/configuration'],
-                    ['title' => 'Navigation', 'path' => 'panel/navigation'],
-                    ['title' => 'Resources', 'path' => 'panel/resources'],
-                    ['title' => 'Pages', 'path' => 'panel/pages'],
+                [
+                    'title' => 'Forms',
+                    'items' => $this->getNavItems(['forms/introduction', 'forms/field-types', 'forms/custom-fields', 'forms/layouts', 'forms/validation', 'forms/reactive-fields']),
                 ],
-            ],
-            [
-                'title' => 'Forms',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'forms/README'],
-                    ['title' => 'Getting Started', 'path' => 'forms/getting-started'],
-                    ['title' => 'Fields', 'path' => 'forms/fields'],
-                    ['title' => 'Layout', 'path' => 'forms/layout'],
-                    ['title' => 'Validation', 'path' => 'forms/validation'],
+                [
+                    'title' => 'Tables',
+                    'items' => $this->getNavItems(['tables/introduction', 'tables/columns', 'tables/filters', 'tables/actions', 'tables/api']),
                 ],
-            ],
-            [
-                'title' => 'Tables',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'tables/README'],
-                    ['title' => 'Getting Started', 'path' => 'tables/getting-started'],
-                    ['title' => 'Columns', 'path' => 'tables/columns'],
-                    ['title' => 'Filters', 'path' => 'tables/filters'],
-                    ['title' => 'Actions', 'path' => 'tables/actions'],
+                [
+                    'title' => 'Infolists',
+                    'items' => $this->getNavItems(['infolists/introduction']),
                 ],
-            ],
-            [
-                'title' => 'Infolists',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'infolists/README'],
-                    ['title' => 'Getting Started', 'path' => 'infolists/getting-started'],
-                    ['title' => 'Entries', 'path' => 'infolists/entries'],
-                    ['title' => 'Layout', 'path' => 'infolists/layout'],
+                [
+                    'title' => 'Actions',
+                    'items' => $this->getNavItems(['actions/introduction']),
                 ],
-            ],
-            [
-                'title' => 'Actions',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'actions/README'],
-                    ['title' => 'Getting Started', 'path' => 'actions/getting-started'],
-                    ['title' => 'Modals', 'path' => 'actions/modals'],
-                    ['title' => 'Notifications', 'path' => 'actions/notifications'],
+                [
+                    'title' => 'Notifications',
+                    'items' => $this->getNavItems(['notifications/introduction']),
                 ],
-            ],
-            [
-                'title' => 'Notifications',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'notifications/README'],
-                    ['title' => 'Getting Started', 'path' => 'notifications/getting-started'],
-                    ['title' => 'Database Notifications', 'path' => 'notifications/database-notifications'],
+                [
+                    'title' => 'Widgets',
+                    'items' => $this->getNavItems(['widgets/introduction']),
                 ],
-            ],
-            [
-                'title' => 'Widgets',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'widgets/README'],
-                    ['title' => 'Getting Started', 'path' => 'widgets/getting-started'],
-                    ['title' => 'Stats', 'path' => 'widgets/stats'],
-                    ['title' => 'Charts', 'path' => 'widgets/charts'],
+                [
+                    'title' => 'Authentication',
+                    'items' => $this->getNavItems(['auth/introduction', 'auth/methods', 'auth/social', 'auth/two-factor', 'auth/passkeys', 'auth/profile']),
                 ],
-            ],
-            [
-                'title' => 'Authentication',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'authentication/README'],
-                    ['title' => 'Configuration', 'path' => 'authentication/configuration'],
-                    ['title' => 'Social Login', 'path' => 'authentication/social-login'],
-                    ['title' => 'Two-Factor Auth', 'path' => 'authentication/two-factor'],
-                    ['title' => 'Passkeys', 'path' => 'authentication/passkeys'],
+                [
+                    'title' => 'AI Integration',
+                    'items' => $this->getNavItems(['ai/introduction']),
                 ],
-            ],
-            [
-                'title' => 'AI Integration',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'ai/README'],
-                    ['title' => 'Configuration', 'path' => 'ai/configuration'],
-                    ['title' => 'Assistants', 'path' => 'ai/assistants'],
-                    ['title' => 'Prompts', 'path' => 'ai/prompts'],
+                [
+                    'title' => 'Schemas',
+                    'items' => $this->getNavItems(['schemas/introduction']),
                 ],
-            ],
-            [
-                'title' => 'Schemas',
-                'items' => [
-                    ['title' => 'Overview', 'path' => 'schemas/README'],
-                    ['title' => 'Components', 'path' => 'schemas/components'],
-                    ['title' => 'Utilities', 'path' => 'schemas/utilities'],
+                [
+                    'title' => 'Advanced',
+                    'items' => $this->getNavItems(['query-builder/introduction', 'plugins/introduction', 'support/introduction']),
                 ],
-            ],
-            [
-                'title' => 'Advanced',
-                'items' => [
-                    ['title' => 'Query Builder', 'path' => 'query-builder/README'],
-                    ['title' => 'Plugins', 'path' => 'plugins/README'],
-                    ['title' => 'Support Utilities', 'path' => 'support/README'],
-                ],
-            ],
-        ];
+            ];
+        });
     }
 
-    public function syncWithGit(): void
+    /**
+     * Get nav items with titles from database.
+     */
+    protected function getNavItems(array $paths): array
     {
-        $cwd = getcwd();
-        chdir($this->docsPath);
-        exec('git pull origin main 2>&1', $output, $returnCode);
-        chdir($cwd);
+        $items = [];
+        $docs = Documentation::whereIn('path', $paths)->get()->keyBy('path');
+
+        foreach ($paths as $path) {
+            $doc = $docs->get($path);
+            $items[] = [
+                'title' => $doc?->title ?? $this->pathToTitle($path),
+                'path' => $path,
+            ];
+        }
+
+        return $items;
+    }
+
+    /**
+     * Convert path to readable title.
+     */
+    protected function pathToTitle(string $path): string
+    {
+        $name = basename($path);
+        if ($name === 'README') {
+            $name = basename(dirname($path));
+        }
+        return ucwords(str_replace(['-', '_'], ' ', $name));
     }
 }
