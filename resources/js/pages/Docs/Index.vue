@@ -1,22 +1,33 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
 import { ref, onMounted, nextTick } from 'vue'
+import SeoHead from '@/components/SeoHead.vue'
 import hljs from 'highlight.js/lib/core'
 import php from 'highlight.js/lib/languages/php'
 import typescript from 'highlight.js/lib/languages/typescript'
 import bash from 'highlight.js/lib/languages/bash'
 import xml from 'highlight.js/lib/languages/xml'
 import javascript from 'highlight.js/lib/languages/javascript'
+import ini from 'highlight.js/lib/languages/ini'
+import json from 'highlight.js/lib/languages/json'
+import css from 'highlight.js/lib/languages/css'
 import 'highlight.js/styles/github-dark.css'
 import DocSearch from '@/components/DocSearch.vue'
 
 hljs.registerLanguage('php', php)
 hljs.registerLanguage('typescript', typescript)
 hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('shell', bash)
 hljs.registerLanguage('xml', xml)
 hljs.registerLanguage('html', xml)
 hljs.registerLanguage('javascript', javascript)
+hljs.registerLanguage('js', javascript)
 hljs.registerLanguage('vue', xml)
+hljs.registerLanguage('ini', ini)
+hljs.registerLanguage('env', ini)
+hljs.registerLanguage('dotenv', ini)
+hljs.registerLanguage('json', json)
+hljs.registerLanguage('css', css)
 
 interface NavItem {
     title: string
@@ -84,7 +95,14 @@ const isActive = (path: string) => props.currentPage === path
 </script>
 
 <template>
-    <Head :title="`${content.title} - Laravilt Documentation`" />
+    <SeoHead
+        :title="content.title || 'Documentation'"
+        :description="content.description || 'Official documentation for Laravilt - a modern admin panel framework for Laravel and Vue.js. Learn how to build beautiful admin panels with forms, tables, and widgets.'"
+        keywords="laravilt docs, laravel admin documentation, vue admin tutorial, crud documentation, laravel forms guide"
+        type="article"
+        section="Documentation"
+        url="/docs"
+    />
 
     <div class="min-h-screen bg-gray-900 text-white">
         <!-- Top Navigation -->
@@ -113,16 +131,28 @@ const isActive = (path: string) => props.currentPage === path
             </div>
         </nav>
 
-        <div class="flex pt-16">
+        <div class="pt-16">
+            <!-- Backdrop -->
+            <Transition
+                enter-active-class="transition-opacity duration-300"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition-opacity duration-300"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div v-if="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"></div>
+            </Transition>
+
             <!-- Sidebar -->
-            <aside :class="['fixed inset-y-0 left-0 z-40 w-72 transform overflow-y-auto border-r border-white/10 bg-gray-900 pt-16 transition-transform duration-300 lg:translate-x-0', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
-                <div class="p-6">
+            <aside :class="['fixed top-16 bottom-0 left-0 z-50 w-72 transform overflow-y-auto border-r border-white/10 bg-gray-900 transition-transform duration-300 lg:z-30 lg:translate-x-0', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
+                <div class="p-6 pb-24">
                     <nav class="space-y-8">
                         <div v-for="section in navigation" :key="section.title">
                             <h4 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ section.title }}</h4>
                             <ul class="space-y-1">
                                 <li v-for="item in section.items" :key="item.path">
-                                    <Link :href="`/docs/${item.path}`" :class="['block rounded-lg px-3 py-2 text-sm transition', isActive(item.path) ? 'bg-[#04bdaf]/10 text-[#04bdaf]' : 'text-gray-400 hover:bg-white/5 hover:text-white']">
+                                    <Link :href="`/docs/${item.path}`" @click="sidebarOpen = false" :class="['block rounded-lg px-3 py-2 text-sm transition', isActive(item.path) ? 'bg-[#04bdaf]/10 text-[#04bdaf]' : 'text-gray-400 hover:bg-white/5 hover:text-white']">
                                         {{ item.title }}
                                     </Link>
                                 </li>
@@ -132,12 +162,9 @@ const isActive = (path: string) => props.currentPage === path
                 </div>
             </aside>
 
-            <!-- Backdrop -->
-            <div v-if="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-30 bg-black/50 lg:hidden"></div>
-
             <!-- Main Content -->
-            <main class="min-h-screen flex-1 lg:pl-72">
-                <div class="mx-auto max-w-4xl px-4 py-12 lg:px-8">
+            <main class="min-h-screen lg:pl-72">
+                <div class="mx-auto max-w-4xl px-4 py-8 lg:px-8 lg:py-12">
                     <article class="prose prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-[#04bdaf] prose-code:rounded prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:before:content-none prose-code:after:content-none prose-pre:bg-gray-800" v-html="content?.html"></article>
 
                     <!-- Edit Link -->

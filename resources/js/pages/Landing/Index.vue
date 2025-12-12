@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { Link } from '@inertiajs/vue3'
+import { ref, onMounted } from 'vue'
+import SeoHead from '@/components/SeoHead.vue'
 
 interface Stat {
     label: string
@@ -62,10 +63,52 @@ const openLightbox = (screenshot: typeof screenshots[0]) => {
 const closeLightbox = () => {
     selectedScreenshot.value = null
 }
+
+// JSON-LD Structured Data
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Laravilt",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "description": "Modern admin panel framework for Laravel and Vue.js. Build beautiful, type-safe admin panels with forms, tables, and widgets.",
+    "url": "https://laravilt.com",
+    "author": {
+        "@type": "Organization",
+        "name": "Laravilt",
+        "url": "https://laravilt.com"
+    },
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    },
+    "featureList": [
+        "Type-safe forms with validation",
+        "Advanced data tables with filters",
+        "Dashboard widgets",
+        "AI integration",
+        "Authentication with 2FA and passkeys",
+        "Vue 3 + TypeScript"
+    ]
+}
+
+onMounted(() => {
+    // Inject JSON-LD
+    const script = document.createElement('script')
+    script.type = 'application/ld+json'
+    script.textContent = JSON.stringify(jsonLd)
+    document.head.appendChild(script)
+})
 </script>
 
 <template>
-    <Head title="Laravilt - Modern Admin Panel for Laravel + Vue" />
+    <SeoHead
+        title="Home"
+        description="Laravilt is a modern admin panel framework for Laravel and Vue.js. Build beautiful, type-safe admin panels with forms, tables, widgets, and AI integration."
+        keywords="laravel admin panel, vue admin, crud generator, laravel forms, laravel tables, typescript admin, inertia admin panel, laravel vue dashboard"
+        url="/"
+    />
 
     <div class="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
         <!-- Navigation -->
@@ -311,10 +354,10 @@ const closeLightbox = () => {
                     <div>
                         <h4 class="mb-4 font-semibold">Documentation</h4>
                         <ul class="space-y-2 text-sm text-gray-500">
-                            <li><Link href="/docs" class="transition hover:text-[#04bdaf]">Getting Started</Link></li>
-                            <li><Link href="/docs" class="transition hover:text-[#04bdaf]">Forms</Link></li>
-                            <li><Link href="/docs" class="transition hover:text-[#04bdaf]">Tables</Link></li>
-                            <li><Link href="/docs" class="transition hover:text-[#04bdaf]">Panel</Link></li>
+                            <li><Link href="/docs/getting-started/installation" class="transition hover:text-[#04bdaf]">Getting Started</Link></li>
+                            <li><Link href="/docs/forms/introduction" class="transition hover:text-[#04bdaf]">Forms</Link></li>
+                            <li><Link href="/docs/tables/introduction" class="transition hover:text-[#04bdaf]">Tables</Link></li>
+                            <li><Link href="/docs/panel/introduction" class="transition hover:text-[#04bdaf]">Panel</Link></li>
                         </ul>
                     </div>
                     <div>

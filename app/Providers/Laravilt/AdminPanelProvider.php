@@ -30,8 +30,6 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->registration()
             ->passwordReset()
-            ->emailVerification()
-            ->otp()
             ->magicLinks()
             ->profile()
             ->passkeys()
@@ -42,10 +40,8 @@ class AdminPanelProvider extends PanelProvider
             ->localeTimezone()
             ->twoFactor(builder: function (TwoFactorProviderBuilder $builder) {
                 $builder->provider(TotpDriver::class);
-                $builder->provider(EmailDriver::class);
             })
             ->socialLogin(function (SocialProviderBuilder $builder) {
-                $builder->provider(GoogleProvider::class, fn (GoogleProvider $p) => $p->enabled());
                 $builder->provider(GitHubProvider::class, fn (GitHubProvider $p) => $p->enabled());
             })
             ->globalSearch(function (GlobalSearchBuilder $search) {

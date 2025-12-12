@@ -39,7 +39,22 @@ const search = async (searchQuery: string) => {
 
     isLoading.value = true
     try {
-        const response = await fetch(`/docs/search?q=${encodeURIComponent(searchQuery)}`)
+        const response = await fetch(`/docs/search?q=${encodeURIComponent(searchQuery)}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const contentType = response.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Response is not JSON')
+        }
+
         results.value = await response.json()
         selectedIndex.value = 0
     } catch (error) {

@@ -1,2 +1,17 @@
+# Laravilt Robots.txt
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemaps
+Sitemap: https://laravilt.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /password/
+
+# Allow search engines to crawl docs
+Allow: /docs/
+Allow: /brand
