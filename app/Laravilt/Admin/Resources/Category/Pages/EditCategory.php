@@ -11,6 +11,14 @@ class EditCategory extends EditRecord
 {
     protected static ?string $resource = CategoryResource::class;
 
+    public function mutateFormDataBeforeSave(array $data): array
+    {
+        // Ensure user_id cannot be changed
+        unset($data['user_id']);
+
+        return $data;
+    }
+
     public function getHeaderActions(): array
     {
         return [

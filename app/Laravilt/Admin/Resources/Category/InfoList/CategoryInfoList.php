@@ -13,33 +13,26 @@ class CategoryInfoList
     {
         return $infolist
             ->schema([
-                Section::make('Information')
-                    ->schema([
-                        Grid::make(2)
-                            ->columns(2)
-                            ->schema([
-                                TextEntry::make('user.name')
-                                    ->label('User'),
+                TextEntry::make('user.name')
+                    ->label('User'),
 
-                                TextEntry::make('name'),
+                TextEntry::make('name'),
 
-                                TextEntry::make('slug'),
+                TextEntry::make('slug'),
 
-                                TextEntry::make('description'),
+                TextEntry::make('description'),
 
-                                TextEntry::make('image'),
+                TextEntry::make('image'),
 
-                                TextEntry::make('is_active'),
+                TextEntry::make('is_active'),
 
-                                TextEntry::make('sort_order'),
+                TextEntry::make('sort_order'),
 
-                                TextEntry::make('created_at')
-                                    ->dateTime(),
+                TextEntry::make('created_at')
+                    ->dateTime(),
 
-                                TextEntry::make('updated_at')
-                                    ->dateTime(),
-                            ]),
-                    ]),
+                TextEntry::make('updated_at')
+                    ->dateTime(),
             ]);
     }
 }

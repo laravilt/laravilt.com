@@ -472,3 +472,24 @@
         scrollbar-color: var(--sidebar-border) transparent;
     }
 }
+
+/* Logo Icon Container - Always White Background */
+@layer utilities {
+    /* Target the logo icon square container */
+    [data-sidebar] .bg-sidebar-primary,
+    [data-sidebar] [class*="bg-sidebar-primary"] {
+        background-color: white !important;
+    }
+
+    /* Make sure the SVG icon colors remain visible on white */
+    [data-sidebar] .bg-sidebar-primary svg,
+    [data-sidebar] [class*="bg-sidebar-primary"] svg {
+        color: inherit !important;
+    }
+
+    /* Dark mode - keep white background */
+    .dark [data-sidebar] .bg-sidebar-primary,
+    .dark [data-sidebar] [class*="bg-sidebar-primary"] {
+        background-color: white !important;
+    }
+}

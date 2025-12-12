@@ -688,8 +688,9 @@ onMounted(() => {
                             class="flex items-center rounded-md border bg-muted p-1"
                             data-view-toggle
                         >
-                            <!-- Table View Button (always shown) -->
+                            <!-- Table View Button (only if table view is available) -->
                             <button
+                                v-if="availableViews?.includes('table')"
                                 type="button"
                                 @click="toggleView('table')"
                                 :class="[
@@ -708,9 +709,9 @@ onMounted(() => {
                                     <line x1="9" y1="3" x2="9" y2="21"/>
                                 </svg>
                             </button>
-                            <!-- Grid View Button (only if grid option is available) -->
+                            <!-- Grid View Button (only if grid view is available) -->
                             <button
-                                v-if="hasGridOption"
+                                v-if="availableViews?.includes('grid')"
                                 type="button"
                                 @click="toggleView('grid')"
                                 :class="[
@@ -729,9 +730,9 @@ onMounted(() => {
                                     <rect x="3" y="14" width="7" height="7"/>
                                 </svg>
                             </button>
-                            <!-- API View Button (only if API option is available) -->
+                            <!-- API View Button (only if API view is available) -->
                             <button
-                                v-if="hasApiOption"
+                                v-if="availableViews?.includes('api')"
                                 type="button"
                                 @click="toggleView('api')"
                                 :class="[

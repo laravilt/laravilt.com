@@ -29,7 +29,7 @@ class ProductForm
                                 TextInput::make('name')
                                     ->required()
                                     ->maxLength(255)
-                                    ->live(onBlur: true)
+                                    ->reactive()
                                     ->afterStateUpdated(fn ($state, callable $set) =>
                                         $set('slug', str($state)->slug()->toString())
                                     ),
@@ -41,7 +41,7 @@ class ProductForm
 
                                 Select::make('category_id')
                                     ->label('Category')
-                                    ->options(fn () => Category::where('user_id', auth()->id())->pluck('name', 'id'))
+                                    ->options(fn () => Category::where('user_id', auth()->id())->pluck('name', 'id')->toArray())
                                     ->searchable()
                                     ->preload()
                                     ->required(),

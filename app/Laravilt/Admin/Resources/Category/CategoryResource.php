@@ -4,15 +4,14 @@ namespace App\Laravilt\Admin\Resources\Category;
 
 use App\Laravilt\Admin\Resources\Category\Form\CategoryForm;
 use App\Laravilt\Admin\Resources\Category\InfoList\CategoryInfoList;
-use App\Laravilt\Admin\Resources\Category\Pages\CreateCategory;
-use App\Laravilt\Admin\Resources\Category\Pages\EditCategory;
-use App\Laravilt\Admin\Resources\Category\Pages\ListCategory;
-use App\Laravilt\Admin\Resources\Category\Pages\ViewCategory;
+use App\Laravilt\Admin\Resources\Category\Pages\ManageCategories;
 use App\Laravilt\Admin\Resources\Category\Table\CategoryTable;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Builder;
 use Laravilt\Panel\Resources\Resource;
 use Laravilt\Schemas\Schema;
+use Laravilt\Tables\ApiColumn;
+use Laravilt\Tables\ApiResource;
 use Laravilt\Tables\Table;
 
 class CategoryResource extends Resource
@@ -35,6 +34,14 @@ class CategoryResource extends Resource
         return parent::getEloquentQuery()->where('user_id', auth()->id());
     }
 
+    /**
+     * Check if the resource is grid-only (table view disabled).
+     */
+    public static function isGridOnly(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CategoryForm::configure($schema);
@@ -53,17 +60,39 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'list' => ListCategory::route('/'),
-            'create' => CreateCategory::route('/create'),
-            'edit' => EditCategory::route('/{record}/edit'),
-            'view' => ViewCategory::route('/{record}'),
+            'index' => ManageCategories::route('/'),
         ];
     }
 
     public static function getRelations(): array
     {
         return [
-            // Add relation managers here
+            RelationManagers\ProductsRelationManager::class,
         ];
+    }
+
+    /**
+     * Configure the API resource for this resource.
+     */
+    public static function api(ApiResource $api): ApiResource
+    {
+        return $api
+            ->description('Categories API - Manage product categories')
+            ->authenticated()
+            ->columns([
+                ApiColumn::make('id')->type('integer'),
+                ApiColumn::make('name')->type('string')->searchable(),
+                ApiColumn::make('slug')->type('string'),
+                ApiColumn::make('description')->type('string'),
+                ApiColumn::make('image')->type('string'),
+                ApiColumn::make('is_active')->type('boolean')->filterable(),
+                ApiColumn::make('sort_order')->type('integer'),
+                ApiColumn::make('products_count')->type('integer')->label('Products Count'),
+                ApiColumn::make('created_at')->type('datetime'),
+                ApiColumn::make('updated_at')->type('datetime'),
+            ])
+            ->allowedFilters(['is_active'])
+            ->allowedSorts(['name', 'sort_order', 'created_at'])
+            ->allowedIncludes(['products']);
     }
 }

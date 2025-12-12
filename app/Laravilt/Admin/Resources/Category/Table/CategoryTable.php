@@ -7,10 +7,14 @@ use Laravilt\Actions\DeleteAction;
 use Laravilt\Actions\DeleteBulkAction;
 use Laravilt\Actions\EditAction;
 use Laravilt\Actions\ViewAction;
-
+use Laravilt\Tables\Card;
+use Laravilt\Tables\Columns\ColorColumn;
+use Laravilt\Tables\Columns\IconColumn;
 use Laravilt\Tables\Columns\ImageColumn;
 use Laravilt\Tables\Columns\TextColumn;
 use Laravilt\Tables\Columns\ToggleColumn;
+use Laravilt\Tables\Filters\SelectFilter;
+use Laravilt\Tables\Filters\TernaryFilter;
 use Laravilt\Tables\Table;
 
 class CategoryTable
@@ -19,36 +23,71 @@ class CategoryTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                TextColumn::make('user.name')
-                    ->label('User')->sortable(),
-
-                TextColumn::make('name')->searchable()->sortable(),
-
-                TextColumn::make('slug')->sortable(),
-
-                TextColumn::make('description')->searchable()->sortable(),
+                TextColumn::make('sort_order')
+                    ->label('#')
+                    ->sortable()
+                    ->alignCenter()
+                    ->width(50),
 
                 ImageColumn::make('image')
-                    ->circular(),
+                    ->label('')
+                    ->circular()
+                    ->size(40),
 
-                ToggleColumn::make('is_active'),
+                TextColumn::make('name')
+                    ->label('Category')
+                    ->description(fn ($record) => $record->description)
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
 
-                TextColumn::make('sort_order')->sortable(),
-
-                TextColumn::make('created_at')->sortable()
-                    ->dateTime()
+                TextColumn::make('slug')
+                    ->searchable()
+                    ->sortable()
+                    ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('updated_at')->sortable()
-                    ->dateTime()
+                ColorColumn::make('color')
+                    ->label('Color')
+                    ->copyable()
+                    ->toggleable(),
+
+                IconColumn::make('icon')
+                    ->label('Icon')
+                    ->toggleable(),
+
+                TextColumn::make('products_count')
+                    ->label('Products')
+                    ->counts('products')
+                    ->badge()
+                    ->color('gray')
+                    ->alignCenter(),
+
+                ToggleColumn::make('is_active')
+                    ->label('Active'),
+
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->date()
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Add filters here
+                TernaryFilter::make('is_active')
+                    ->label('Status')
+                    ->trueLabel('Active Only')
+                    ->falseLabel('Inactive Only'),
+
+                TernaryFilter::make('has_products')
+                    ->label('Has Products')
+                    ->trueLabel('With Products')
+                    ->falseLabel('Empty')
+                    ->queries(
+                        true: fn ($query) => $query->has('products'),
+                        false: fn ($query) => $query->doesntHave('products')
+                    ),
             ])
+            ->filtersLayout('dropdown')
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -59,8 +98,10 @@ class CategoryTable
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc')
+            ->reorderable('sort_order')
+            ->defaultSort('sort_order', 'asc')
             ->paginated([10, 25, 50, 100])
-            ->searchable();
+            ->searchable()
+            ->striped();
     }
 }
