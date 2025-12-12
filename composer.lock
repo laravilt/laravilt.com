@@ -2411,16 +2411,16 @@
         },
         {
             "name": "laravilt/auth",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/auth.git",
-                "reference": "5c0a9d6a454fa5b1800b8ddecda82189b2161bb6"
+                "reference": "b71ddb08f9b99c9b79dcf1735f2b41d267c8bb62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/auth/zipball/5c0a9d6a454fa5b1800b8ddecda82189b2161bb6",
-                "reference": "5c0a9d6a454fa5b1800b8ddecda82189b2161bb6",
+                "url": "https://api.github.com/repos/laravilt/auth/zipball/b71ddb08f9b99c9b79dcf1735f2b41d267c8bb62",
+                "reference": "b71ddb08f9b99c9b79dcf1735f2b41d267c8bb62",
                 "shasum": ""
             },
             "require": {
@@ -2490,7 +2490,7 @@
             ],
             "support": {
                 "issues": "https://github.com/laravilt/auth/issues",
-                "source": "https://github.com/laravilt/auth/tree/v1.0.1"
+                "source": "https://github.com/laravilt/auth/tree/v1.0.2"
             },
             "funding": [
                 {
@@ -2498,20 +2498,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-12T07:45:58+00:00"
+            "time": "2025-12-12T14:40:12+00:00"
         },
         {
             "name": "laravilt/forms",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/forms.git",
-                "reference": "173a0e0bdc0d5d1ccedaff637f82864d036c736e"
+                "reference": "09b05b2f1e9e46ea7e84277b8eede01aa62bae1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/forms/zipball/173a0e0bdc0d5d1ccedaff637f82864d036c736e",
-                "reference": "173a0e0bdc0d5d1ccedaff637f82864d036c736e",
+                "url": "https://api.github.com/repos/laravilt/forms/zipball/09b05b2f1e9e46ea7e84277b8eede01aa62bae1f",
+                "reference": "09b05b2f1e9e46ea7e84277b8eede01aa62bae1f",
                 "shasum": ""
             },
             "require": {
@@ -2572,7 +2572,7 @@
             ],
             "support": {
                 "issues": "https://github.com/laravilt/forms/issues",
-                "source": "https://github.com/laravilt/forms/tree/v1.0.1"
+                "source": "https://github.com/laravilt/forms/tree/v1.0.2"
             },
             "funding": [
                 {
@@ -2580,20 +2580,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-12T07:45:58+00:00"
+            "time": "2025-12-12T14:40:35+00:00"
         },
         {
             "name": "laravilt/infolists",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/infolists.git",
-                "reference": "e005ea2d45486f619dc02c3ea48277a0a7a88e2e"
+                "reference": "94bf99f1bc3541b7aa07447b2ecae467778a6e22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/infolists/zipball/e005ea2d45486f619dc02c3ea48277a0a7a88e2e",
-                "reference": "e005ea2d45486f619dc02c3ea48277a0a7a88e2e",
+                "url": "https://api.github.com/repos/laravilt/infolists/zipball/94bf99f1bc3541b7aa07447b2ecae467778a6e22",
+                "reference": "94bf99f1bc3541b7aa07447b2ecae467778a6e22",
                 "shasum": ""
             },
             "require": {
@@ -2653,7 +2653,7 @@
             ],
             "support": {
                 "issues": "https://github.com/laravilt/infolists/issues",
-                "source": "https://github.com/laravilt/infolists/tree/v1.0.1"
+                "source": "https://github.com/laravilt/infolists/tree/v1.0.2"
             },
             "funding": [
                 {
@@ -2661,7 +2661,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-12T07:45:58+00:00"
+            "time": "2025-12-12T14:40:56+00:00"
         },
         {
             "name": "laravilt/laravilt",
@@ -2752,16 +2752,16 @@
         },
         {
             "name": "laravilt/notifications",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/notifications.git",
-                "reference": "f0e5493b5aac63faf1b37285539fd9530f3a7b4e"
+                "reference": "c89847b34eb6079d9b1fc4c732b47563d506c60b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/notifications/zipball/f0e5493b5aac63faf1b37285539fd9530f3a7b4e",
-                "reference": "f0e5493b5aac63faf1b37285539fd9530f3a7b4e",
+                "url": "https://api.github.com/repos/laravilt/notifications/zipball/c89847b34eb6079d9b1fc4c732b47563d506c60b",
+                "reference": "c89847b34eb6079d9b1fc4c732b47563d506c60b",
                 "shasum": ""
             },
             "require": {
@@ -2821,7 +2821,7 @@
             ],
             "support": {
                 "issues": "https://github.com/laravilt/notifications/issues",
-                "source": "https://github.com/laravilt/notifications/tree/v1.0.1"
+                "source": "https://github.com/laravilt/notifications/tree/v1.0.2"
             },
             "funding": [
                 {
@@ -2829,20 +2829,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-12T07:45:58+00:00"
+            "time": "2025-12-12T14:41:37+00:00"
         },
         {
             "name": "laravilt/panel",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/panel.git",
-                "reference": "8eacf8b4aed5e66b63f4fcd63556f27d692f71c6"
+                "reference": "bbc5a3001894e02af64be35b80d72630e9d3f009"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/panel/zipball/8eacf8b4aed5e66b63f4fcd63556f27d692f71c6",
-                "reference": "8eacf8b4aed5e66b63f4fcd63556f27d692f71c6",
+                "url": "https://api.github.com/repos/laravilt/panel/zipball/bbc5a3001894e02af64be35b80d72630e9d3f009",
+                "reference": "bbc5a3001894e02af64be35b80d72630e9d3f009",
                 "shasum": ""
             },
             "require": {
@@ -2901,7 +2901,7 @@
             ],
             "support": {
                 "issues": "https://github.com/laravilt/panel/issues",
-                "source": "https://github.com/laravilt/panel/tree/v1.0.1"
+                "source": "https://github.com/laravilt/panel/tree/v1.0.2"
             },
             "funding": [
                 {
@@ -2909,7 +2909,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-12T07:45:58+00:00"
+            "time": "2025-12-12T14:42:19+00:00"
         },
         {
             "name": "laravilt/plugins",
@@ -3236,16 +3236,16 @@
         },
         {
             "name": "laravilt/tables",
-            "version": "1.0.0",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/tables.git",
-                "reference": "9d1362e7234ebe318ce92bfed6129610264a6cf5"
+                "reference": "c75c79a46c68f864afdd2dfd08df63b03a6381f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/tables/zipball/9d1362e7234ebe318ce92bfed6129610264a6cf5",
-                "reference": "9d1362e7234ebe318ce92bfed6129610264a6cf5",
+                "url": "https://api.github.com/repos/laravilt/tables/zipball/c75c79a46c68f864afdd2dfd08df63b03a6381f4",
+                "reference": "c75c79a46c68f864afdd2dfd08df63b03a6381f4",
                 "shasum": ""
             },
             "require": {
@@ -3309,7 +3309,7 @@
             ],
             "support": {
                 "issues": "https://github.com/laravilt/tables/issues",
-                "source": "https://github.com/laravilt/tables/tree/v1.0.0"
+                "source": "https://github.com/laravilt/tables/tree/v1.0.2"
             },
             "funding": [
                 {
@@ -3317,7 +3317,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-11T15:20:48+00:00"
+            "time": "2025-12-12T14:42:26+00:00"
         },
         {
             "name": "laravilt/widgets",
