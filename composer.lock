@@ -2251,16 +2251,16 @@
         },
         {
             "name": "laravilt/actions",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/actions.git",
-                "reference": "bfd68c43bbec359685f7eafcd1b26baaf6bb0db4"
+                "reference": "20a1c1536c49876648435ed3602507702f400904"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/actions/zipball/bfd68c43bbec359685f7eafcd1b26baaf6bb0db4",
-                "reference": "bfd68c43bbec359685f7eafcd1b26baaf6bb0db4",
+                "url": "https://api.github.com/repos/laravilt/actions/zipball/20a1c1536c49876648435ed3602507702f400904",
+                "reference": "20a1c1536c49876648435ed3602507702f400904",
                 "shasum": ""
             },
             "require": {
@@ -2317,7 +2317,7 @@
             ],
             "support": {
                 "issues": "https://github.com/laravilt/actions/issues",
-                "source": "https://github.com/laravilt/actions/tree/v1.0.1"
+                "source": "https://github.com/laravilt/actions/tree/v1.0.2"
             },
             "funding": [
                 {
@@ -2325,7 +2325,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-12T07:45:58+00:00"
+            "time": "2025-12-13T21:20:30+00:00"
         },
         {
             "name": "laravilt/ai",
@@ -2837,12 +2837,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/panel.git",
-                "reference": "3a2f67aa899b11d16588b276baa6240b2ecf374a"
+                "reference": "308eb2140a511dece351c4a7ac5c2644e9d0d019"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/panel/zipball/3a2f67aa899b11d16588b276baa6240b2ecf374a",
-                "reference": "3a2f67aa899b11d16588b276baa6240b2ecf374a",
+                "url": "https://api.github.com/repos/laravilt/panel/zipball/308eb2140a511dece351c4a7ac5c2644e9d0d019",
+                "reference": "308eb2140a511dece351c4a7ac5c2644e9d0d019",
                 "shasum": ""
             },
             "require": {
@@ -2909,7 +2909,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-13T20:15:48+00:00"
+            "time": "2025-12-13T21:32:19+00:00"
         },
         {
             "name": "laravilt/plugins",

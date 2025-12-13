@@ -22,7 +22,7 @@ class CustomerInfoList
                             ->label('')
                             ->circular()
                             ->size(80)
-                            ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->full_name) . '&background=random&size=160'),
+                            ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record?->full_name ?? 'User') . '&background=random&size=160'),
 
                         Grid::make(2)
                             ->columnSpan(2)
