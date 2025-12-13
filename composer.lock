@@ -2506,12 +2506,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/forms.git",
-                "reference": "1be858ef3570b251009a18aec7c5fa98493ec1cb"
+                "reference": "95a5f649520cef66c84fbb30419d9df96f207ec6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/forms/zipball/1be858ef3570b251009a18aec7c5fa98493ec1cb",
-                "reference": "1be858ef3570b251009a18aec7c5fa98493ec1cb",
+                "url": "https://api.github.com/repos/laravilt/forms/zipball/95a5f649520cef66c84fbb30419d9df96f207ec6",
+                "reference": "95a5f649520cef66c84fbb30419d9df96f207ec6",
                 "shasum": ""
             },
             "require": {
@@ -2580,7 +2580,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-13T20:15:12+00:00"
+            "time": "2025-12-13T20:34:38+00:00"
         },
         {
             "name": "laravilt/infolists",
