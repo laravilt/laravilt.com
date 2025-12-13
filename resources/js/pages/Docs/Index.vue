@@ -53,6 +53,20 @@ const props = defineProps<{
 }>()
 
 const sidebarOpen = ref(false)
+const sidebarCollapsed = ref(false)
+
+// Persist sidebar state in localStorage
+onMounted(() => {
+    const saved = localStorage.getItem('docs-sidebar-collapsed')
+    if (saved !== null) {
+        sidebarCollapsed.value = saved === 'true'
+    }
+})
+
+const toggleSidebar = () => {
+    sidebarCollapsed.value = !sidebarCollapsed.value
+    localStorage.setItem('docs-sidebar-collapsed', String(sidebarCollapsed.value))
+}
 
 const addCopyButtons = () => {
     document.querySelectorAll('pre').forEach((pre) => {
@@ -145,14 +159,19 @@ const isActive = (path: string) => props.currentPage === path
             </Transition>
 
             <!-- Sidebar -->
-            <aside :class="['fixed top-16 bottom-0 left-0 z-50 w-72 transform overflow-y-auto border-r border-white/10 bg-gray-900 transition-transform duration-300 lg:z-30 lg:translate-x-0', sidebarOpen ? 'translate-x-0' : '-translate-x-full']">
-                <div class="p-6 pb-24">
+            <aside :class="[
+                'fixed top-16 bottom-0 left-0 z-50 transform overflow-y-auto border-r border-white/10 bg-gray-900 transition-all duration-300',
+                sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+                sidebarCollapsed ? 'lg:w-0 lg:border-r-0' : 'lg:w-72',
+                'lg:z-30 lg:translate-x-0 w-72'
+            ]">
+                <div :class="['p-6 pb-24 transition-opacity duration-200', sidebarCollapsed ? 'lg:opacity-0 lg:invisible' : '']">
                     <nav class="space-y-8">
                         <div v-for="section in navigation" :key="section.title">
                             <h4 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ section.title }}</h4>
                             <ul class="space-y-1">
                                 <li v-for="item in section.items" :key="item.path">
-                                    <Link :href="`/docs/${item.path}`" @click="sidebarOpen = false" :class="['block rounded-lg px-3 py-2 text-sm transition', isActive(item.path) ? 'bg-[#04bdaf]/10 text-[#04bdaf]' : 'text-gray-400 hover:bg-white/5 hover:text-white']">
+                                    <Link :href="`/docs/${item.path}`" @click="sidebarOpen = false" :class="['block rounded-lg px-3 py-2 text-sm transition whitespace-nowrap', isActive(item.path) ? 'bg-[#04bdaf]/10 text-[#04bdaf]' : 'text-gray-400 hover:bg-white/5 hover:text-white']">
                                         {{ item.title }}
                                     </Link>
                                 </li>
@@ -162,8 +181,30 @@ const isActive = (path: string) => props.currentPage === path
                 </div>
             </aside>
 
+            <!-- Desktop Sidebar Toggle Button -->
+            <button
+                @click="toggleSidebar"
+                :class="[
+                    'fixed z-40 hidden lg:flex items-center justify-center w-6 h-12 bg-gray-800 border border-white/10 rounded-r-lg transition-all duration-300 hover:bg-gray-700',
+                    sidebarCollapsed ? 'left-0' : 'left-72'
+                ]"
+                style="top: 50%;"
+                :title="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    :class="['size-4 text-gray-400 transition-transform duration-300', sidebarCollapsed ? '' : 'rotate-180']"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+            </button>
+
             <!-- Main Content -->
-            <main class="min-h-screen lg:pl-72">
+            <main :class="['min-h-screen transition-all duration-300', sidebarCollapsed ? 'lg:pl-0' : 'lg:pl-72']">
                 <div class="mx-auto max-w-4xl px-4 py-8 lg:px-8 lg:py-12">
                     <article class="prose prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-[#04bdaf] prose-code:rounded prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:before:content-none prose-code:after:content-none prose-pre:bg-gray-800" v-html="content?.html"></article>
 

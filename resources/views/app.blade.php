@@ -5,6 +5,71 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        {{-- SEO Meta Tags (Server-side rendered for social sharing) --}}
+        @php
+            $seoData = $seo ?? [
+                'fullTitle' => config('app.name', 'Laravilt') . ' - Modern Admin Panel Framework for Laravel + Vue',
+                'description' => 'Laravilt is a modern admin panel framework for Laravel and Vue.js. Build beautiful, type-safe admin panels with forms, tables, widgets, and AI integration.',
+                'keywords' => 'laravel, vue, admin panel, crud, forms, tables, typescript, inertia, filament alternative',
+                'image' => url('/screenshots/14-dashboard-widgets.png'),
+                'url' => url()->current(),
+                'type' => 'website',
+                'author' => 'Laravilt',
+                'siteName' => config('app.name', 'Laravilt'),
+                'twitterHandle' => '@laravilt',
+                'noindex' => false,
+                'publishedTime' => null,
+                'modifiedTime' => null,
+                'section' => null,
+            ];
+        @endphp
+
+        {{-- Primary Meta Tags --}}
+        <meta name="title" content="{{ $seoData['fullTitle'] }}">
+        <meta name="description" content="{{ $seoData['description'] }}">
+        <meta name="keywords" content="{{ $seoData['keywords'] }}">
+        <meta name="author" content="{{ $seoData['author'] ?? 'Laravilt' }}">
+        <meta name="robots" content="{{ ($seoData['noindex'] ?? false) ? 'noindex, nofollow' : 'index, follow' }}">
+        <link rel="canonical" href="{{ $seoData['url'] }}">
+
+        {{-- Open Graph / Facebook --}}
+        <meta property="og:type" content="{{ $seoData['type'] }}">
+        <meta property="og:site_name" content="{{ $seoData['siteName'] }}">
+        <meta property="og:url" content="{{ $seoData['url'] }}">
+        <meta property="og:title" content="{{ $seoData['fullTitle'] }}">
+        <meta property="og:description" content="{{ $seoData['description'] }}">
+        <meta property="og:image" content="{{ $seoData['image'] }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:locale" content="en_US">
+
+        {{-- Article specific (for docs/blog) --}}
+        @if(($seoData['type'] ?? 'website') === 'article')
+            @if(!empty($seoData['publishedTime']))
+                <meta property="article:published_time" content="{{ $seoData['publishedTime'] }}">
+            @endif
+            @if(!empty($seoData['modifiedTime']))
+                <meta property="article:modified_time" content="{{ $seoData['modifiedTime'] }}">
+            @endif
+            @if(!empty($seoData['section']))
+                <meta property="article:section" content="{{ $seoData['section'] }}">
+            @endif
+            <meta property="article:author" content="{{ $seoData['author'] ?? 'Laravilt' }}">
+        @endif
+
+        {{-- Twitter --}}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="{{ $seoData['twitterHandle'] }}">
+        <meta name="twitter:creator" content="{{ $seoData['twitterHandle'] }}">
+        <meta name="twitter:url" content="{{ $seoData['url'] }}">
+        <meta name="twitter:title" content="{{ $seoData['fullTitle'] }}">
+        <meta name="twitter:description" content="{{ $seoData['description'] }}">
+        <meta name="twitter:image" content="{{ $seoData['image'] }}">
+
+        {{-- Additional SEO --}}
+        <meta name="theme-color" content="#04bdaf">
+        <meta name="msapplication-TileColor" content="#04bdaf">
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         {{-- Also handle locale and direction from page props --}}
         <script>
@@ -55,7 +120,7 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ $seoData['fullTitle'] }}</title>
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">

@@ -41,7 +41,7 @@ class ProductForm
 
                                 Select::make('category_id')
                                     ->label('Category')
-                                    ->options(fn () => Category::where('user_id', auth()->id())->pluck('name', 'id')->toArray())
+                                    ->relationship('category', 'name')
                                     ->searchable()
                                     ->preload()
                                     ->required(),

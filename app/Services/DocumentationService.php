@@ -239,60 +239,80 @@ class DocumentationService
 
     /**
      * Get navigation structure.
+     * This is a hybrid approach: defined order for main sections, but dynamically discovers items.
      */
     public function getNavigation(): array
     {
         return Cache::remember('docs_navigation', 3600, function () {
-            return [
-                [
-                    'title' => 'Getting Started',
-                    'items' => $this->getNavItems(['getting-started/installation', 'getting-started/quick-start', 'getting-started/architecture']),
-                ],
-                [
-                    'title' => 'Panel',
-                    'items' => $this->getNavItems(['panel/introduction', 'panel/creating-panels', 'panel/navigation', 'panel/resources', 'panel/pages', 'panel/themes']),
-                ],
-                [
-                    'title' => 'Forms',
-                    'items' => $this->getNavItems(['forms/introduction', 'forms/field-types', 'forms/custom-fields', 'forms/layouts', 'forms/validation', 'forms/reactive-fields']),
-                ],
-                [
-                    'title' => 'Tables',
-                    'items' => $this->getNavItems(['tables/introduction', 'tables/columns', 'tables/filters', 'tables/actions', 'tables/api']),
-                ],
-                [
-                    'title' => 'Infolists',
-                    'items' => $this->getNavItems(['infolists/introduction']),
-                ],
-                [
-                    'title' => 'Actions',
-                    'items' => $this->getNavItems(['actions/introduction']),
-                ],
-                [
-                    'title' => 'Notifications',
-                    'items' => $this->getNavItems(['notifications/introduction']),
-                ],
-                [
-                    'title' => 'Widgets',
-                    'items' => $this->getNavItems(['widgets/introduction']),
-                ],
-                [
-                    'title' => 'Authentication',
-                    'items' => $this->getNavItems(['auth/introduction', 'auth/methods', 'auth/social', 'auth/two-factor', 'auth/passkeys', 'auth/profile']),
-                ],
-                [
-                    'title' => 'AI Integration',
-                    'items' => $this->getNavItems(['ai/introduction']),
-                ],
-                [
-                    'title' => 'Schemas',
-                    'items' => $this->getNavItems(['schemas/introduction']),
-                ],
-                [
-                    'title' => 'Advanced',
-                    'items' => $this->getNavItems(['query-builder/introduction', 'plugins/introduction', 'support/introduction']),
-                ],
+            // Define section order and display names
+            $sectionConfig = [
+                'getting-started' => 'Getting Started',
+                'panel' => 'Panel',
+                'forms' => 'Forms',
+                'tables' => 'Tables',
+                'infolists' => 'Infolists',
+                'actions' => 'Actions',
+                'notifications' => 'Notifications',
+                'widgets' => 'Widgets',
+                'auth' => 'Authentication',
+                'ai' => 'AI Integration',
+                'schemas' => 'Schemas',
+                'frontend' => 'Frontend',
+                'query-builder' => 'Query Builder',
+                'plugins' => 'Plugins',
+                'support' => 'Support',
             ];
+
+            // Get all docs from database grouped by section
+            $allDocs = Documentation::orderBy('order')
+                ->orderBy('path')
+                ->get()
+                ->groupBy(function ($doc) {
+                    $parts = explode('/', $doc->path);
+                    return $parts[0] ?? 'other';
+                });
+
+            $navigation = [];
+
+            // First add configured sections in order
+            foreach ($sectionConfig as $section => $title) {
+                if ($allDocs->has($section)) {
+                    $items = $allDocs->get($section)->map(function ($doc) {
+                        return [
+                            'title' => $doc->title ?? $this->pathToTitle($doc->path),
+                            'path' => $doc->path,
+                        ];
+                    })->toArray();
+
+                    if (!empty($items)) {
+                        $navigation[] = [
+                            'title' => $title,
+                            'items' => $items,
+                        ];
+                    }
+                }
+            }
+
+            // Then add any new sections that aren't in the config (dynamic discovery)
+            foreach ($allDocs as $section => $docs) {
+                if (!array_key_exists($section, $sectionConfig) && $section !== 'other') {
+                    $items = $docs->map(function ($doc) {
+                        return [
+                            'title' => $doc->title ?? $this->pathToTitle($doc->path),
+                            'path' => $doc->path,
+                        ];
+                    })->toArray();
+
+                    if (!empty($items)) {
+                        $navigation[] = [
+                            'title' => ucwords(str_replace(['-', '_'], ' ', $section)),
+                            'items' => $items,
+                        ];
+                    }
+                }
+            }
+
+            return $navigation;
         });
     }
 

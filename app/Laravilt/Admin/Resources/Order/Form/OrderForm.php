@@ -22,6 +22,7 @@ class OrderForm
     public static function configure(Schema $form): Schema
     {
         return $form
+            ->columns(2)
             ->schema([
                 Section::make('Order Information')
                     ->icon('ShoppingCart')
@@ -98,12 +99,12 @@ class OrderForm
                     ->collapsible()
                     ->schema([
                         Repeater::make('items')
-                            ->relationship()
+                            ->relationship('items')
                             ->label('Products')
                             ->schema([
                                 Select::make('product_id')
                                     ->label('Product')
-                                    ->options(fn () => Product::where('user_id', auth()->id())->pluck('name', 'id'))
+                                    ->options(fn () => Product::query()->where('user_id', auth()->id())->pluck('name', 'id')->toArray())
                                     ->searchable()
                                     ->required()
                                     ->live()
@@ -114,8 +115,9 @@ class OrderForm
                                                 $set('product_name', $product->name);
                                                 $set('product_sku', $product->sku);
                                                 $set('unit_price', $product->price);
-                                                $qty = $get('quantity') ?: 1;
-                                                $set('total_price', $product->price * $qty);
+                                                $qty = (float) ($get('quantity') ?: 1);
+                                                $discount = (float) ($get('discount') ?: 0);
+                                                $set('total_price', ($product->price * $qty) - $discount);
                                             }
                                         }
                                     })
@@ -132,8 +134,10 @@ class OrderForm
                                     ->required()
                                     ->live()
                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        $unitPrice = $get('unit_price') ?: 0;
-                                        $set('total_price', $unitPrice * ($state ?: 1));
+                                        $unitPrice = (float) ($get('unit_price') ?: 0);
+                                        $qty = (float) ($state ?: 1);
+                                        $discount = (float) ($get('discount') ?: 0);
+                                        $set('total_price', ($unitPrice * $qty) - $discount);
                                     }),
 
                                 TextInput::make('unit_price')
@@ -143,15 +147,24 @@ class OrderForm
                                     ->required()
                                     ->live()
                                     ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                        $qty = $get('quantity') ?: 1;
-                                        $set('total_price', ($state ?: 0) * $qty);
+                                        $unitPrice = (float) ($state ?: 0);
+                                        $qty = (float) ($get('quantity') ?: 1);
+                                        $discount = (float) ($get('discount') ?: 0);
+                                        $set('total_price', ($unitPrice * $qty) - $discount);
                                     }),
 
                                 TextInput::make('discount')
                                     ->label('Discount')
                                     ->numeric()
                                     ->prefix('$')
-                                    ->default(0),
+                                    ->default(0)
+                                    ->live()
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        $unitPrice = (float) ($get('unit_price') ?: 0);
+                                        $qty = (float) ($get('quantity') ?: 1);
+                                        $discount = (float) ($state ?: 0);
+                                        $set('total_price', ($unitPrice * $qty) - $discount);
+                                    }),
 
                                 TextInput::make('total_price')
                                     ->label('Total')

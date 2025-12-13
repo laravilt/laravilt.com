@@ -2,12 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\WithSeo;
+use App\Support\SeoData;
 use Inertia\Inertia;
 
 class LandingController extends Controller
 {
+    use WithSeo;
+
     public function index()
     {
+        $this->seo(
+            SeoData::make('Home')
+                ->description('Laravilt is a modern admin panel framework for Laravel and Vue.js. Build beautiful, type-safe admin panels with forms, tables, widgets, and AI integration.')
+                ->keywords('laravel admin panel, vue admin, crud generator, laravel forms, laravel tables, typescript admin, inertia admin panel, filament alternative')
+                ->image('/screenshots/14-dashboard-widgets.png')
+                ->url('/')
+        );
+
         return Inertia::render('Landing/Index', [
             'stats' => [
                 ['label' => 'Packages', 'value' => '14+'],

@@ -31,7 +31,7 @@ class OrderItemsRelationManager extends RelationManager
             ->schema([
                 Select::make('product_id')
                     ->label('Product')
-                    ->options(fn () => Product::where('user_id', auth()->id())
+                    ->options(fn () => Product::query()
                         ->where('status', 'published')
                         ->pluck('name', 'id')
                         ->toArray())

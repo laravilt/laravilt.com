@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\WithSeo;
 use App\Models\User;
 use App\Services\DemoSeederService;
+use App\Support\SeoData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +15,8 @@ use Inertia\Inertia;
 
 class DemoController extends Controller
 {
+    use WithSeo;
+
     protected DemoSeederService $seeder;
 
     public function __construct(DemoSeederService $seeder)
@@ -25,6 +29,14 @@ class DemoController extends Controller
      */
     public function index()
     {
+        $this->seo(
+            SeoData::make('Try Demo')
+                ->description('Try Laravilt admin panel demo instantly. No registration required. Experience 30+ form fields, advanced tables, AI integration, and more.')
+                ->keywords('laravilt demo, laravel admin demo, try admin panel, vue admin preview')
+                ->image('/screenshots/16-dashboard-light-mode.png')
+                ->url('/demo')
+        );
+
         return Inertia::render('Demo/Index');
     }
 

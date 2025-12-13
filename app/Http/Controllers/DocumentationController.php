@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\WithSeo;
 use App\Services\DocumentationService;
+use App\Support\SeoData;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DocumentationController extends Controller
 {
+    use WithSeo;
+
     public function __construct(protected DocumentationService $docs)
     {
     }
@@ -25,6 +29,15 @@ class DocumentationController extends Controller
                 'editUrl' => 'https://github.com/laravilt/laravilt/tree/master/docs',
             ];
         }
+
+        $this->seo(
+            SeoData::make($content['title'] ?? 'Documentation')
+                ->description($content['description'] ?? 'Laravilt documentation - Learn how to build modern admin panels with Laravel and Vue.js.')
+                ->keywords('laravilt docs, laravel admin documentation, vue admin guide, crud tutorial')
+                ->image('/screenshots/01-products-table-view.png')
+                ->url('/docs')
+                ->article()
+        );
 
         return Inertia::render('Docs/Index', [
             'navigation' => $this->docs->getNavigation(),
@@ -47,6 +60,18 @@ class DocumentationController extends Controller
                 'editUrl' => "https://github.com/laravilt/laravilt/tree/master/docs/{$path}.md",
             ];
         }
+
+        // Build SEO-friendly section name from path
+        $section = ucwords(str_replace(['-', '_', '/'], ' ', explode('/', $path)[0] ?? 'Documentation'));
+
+        $this->seo(
+            SeoData::make($content['title'] ?? 'Documentation')
+                ->description($content['description'] ?? "Laravilt {$section} documentation - comprehensive guide for building admin panels.")
+                ->keywords("laravilt {$section}, laravel admin {$section}, vue admin guide")
+                ->image('/screenshots/01-products-table-view.png')
+                ->url("/docs/{$page}")
+                ->article(section: $section)
+        );
 
         return Inertia::render('Docs/Show', [
             'navigation' => $this->docs->getNavigation(),
