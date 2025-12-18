@@ -2890,12 +2890,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravilt/panel.git",
-                "reference": "0524cd01609692330c7640a817573c22d40672f5"
+                "reference": "a4dd66de39b4209ea405e3a627b0c2260c15cf34"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravilt/panel/zipball/0524cd01609692330c7640a817573c22d40672f5",
-                "reference": "0524cd01609692330c7640a817573c22d40672f5",
+                "url": "https://api.github.com/repos/laravilt/panel/zipball/a4dd66de39b4209ea405e3a627b0c2260c15cf34",
+                "reference": "a4dd66de39b4209ea405e3a627b0c2260c15cf34",
                 "shasum": ""
             },
             "require": {
@@ -2963,7 +2963,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-18T11:49:34+00:00"
+            "time": "2025-12-18T11:58:40+00:00"
         },
         {
             "name": "laravilt/plugins",
