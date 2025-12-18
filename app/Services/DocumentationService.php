@@ -213,6 +213,51 @@ class DocumentationService
 
         $html = $this->converter->convert($body)->getContent();
 
+        // Fix internal documentation links (remove .md extension and convert to proper /docs/ paths)
+        // Get the current document's folder for resolving relative links
+        $currentFolder = dirname($path);
+        if ($currentFolder === '.') {
+            $currentFolder = '';
+        }
+
+        $html = preg_replace_callback(
+            '/href="([^"]*)"/',
+            function ($matches) use ($currentFolder) {
+                $link = $matches[1];
+
+                // Skip external links, anchor links, and already absolute paths
+                if (str_starts_with($link, 'http') || str_starts_with($link, '#') || str_starts_with($link, '/')) {
+                    return $matches[0];
+                }
+
+                // Remove .md extension if present
+                $link = preg_replace('/\.md$/', '', $link);
+
+                // Handle relative paths (e.g., ../getting-started/installation or ./resources)
+                if (str_starts_with($link, '../')) {
+                    // Go up one directory - remove the ../ prefix
+                    $link = substr($link, 3);
+                    // The link is relative to parent, so use it directly
+                    $link = '/docs/' . $link;
+                } elseif (str_starts_with($link, './')) {
+                    // Same directory - remove the ./ prefix
+                    $link = substr($link, 2);
+                    $link = $currentFolder ? '/docs/' . $currentFolder . '/' . $link : '/docs/' . $link;
+                } else {
+                    // No prefix - could be same folder or root reference
+                    // If the link doesn't contain a slash, it's likely a sibling file in the same folder
+                    if (!str_contains($link, '/') && $currentFolder) {
+                        $link = '/docs/' . $currentFolder . '/' . $link;
+                    } else {
+                        $link = '/docs/' . $link;
+                    }
+                }
+
+                return 'href="' . $link . '"';
+            },
+            $html
+        );
+
         Documentation::updateOrCreate(
             ['path' => $path],
             [
@@ -263,6 +308,16 @@ class DocumentationService
                 'support' => 'Support',
             ];
 
+            // Define item order within each section (introduction always first)
+            $itemOrder = [
+                'getting-started' => ['installation', 'quick-start', 'architecture'],
+                'panel' => ['introduction', 'creating-panels', 'resources', 'pages', 'navigation', 'themes', 'tenancy'],
+                'forms' => ['introduction', 'field-types', 'validation', 'layouts', 'reactive-fields', 'custom-fields'],
+                'tables' => ['introduction', 'columns', 'filters', 'actions', 'api'],
+                'auth' => ['introduction', 'methods', 'two-factor', 'social', 'passkeys', 'profile'],
+                'frontend' => ['README', 'components', 'layouts', 'styling', 'utilities'],
+            ];
+
             // Get all docs from database grouped by section
             $allDocs = Documentation::orderBy('order')
                 ->orderBy('path')
@@ -277,12 +332,29 @@ class DocumentationService
             // First add configured sections in order
             foreach ($sectionConfig as $section => $title) {
                 if ($allDocs->has($section)) {
-                    $items = $allDocs->get($section)->map(function ($doc) {
+                    $docs = $allDocs->get($section);
+
+                    // Sort items based on predefined order if available
+                    if (isset($itemOrder[$section])) {
+                        $order = $itemOrder[$section];
+                        $docs = $docs->sort(function ($a, $b) use ($order, $section) {
+                            $aName = str_replace($section . '/', '', $a->path);
+                            $bName = str_replace($section . '/', '', $b->path);
+                            $aIndex = array_search($aName, $order);
+                            $bIndex = array_search($bName, $order);
+                            // Items not in order list go to the end
+                            if ($aIndex === false) $aIndex = 999;
+                            if ($bIndex === false) $bIndex = 999;
+                            return $aIndex - $bIndex;
+                        });
+                    }
+
+                    $items = $docs->map(function ($doc) {
                         return [
                             'title' => $doc->title ?? $this->pathToTitle($doc->path),
                             'path' => $doc->path,
                         ];
-                    })->toArray();
+                    })->values()->toArray();
 
                     if (!empty($items)) {
                         $navigation[] = [

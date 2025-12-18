@@ -325,12 +325,12 @@ const iconMap: Record<string, string> = {
 // Documentation sections for quick access
 const docSections = [
     { title: 'Installation', href: '/docs/getting-started/installation', desc: 'Get up and running in minutes' },
-    { title: 'Schema Builder', href: '/docs/schemas', desc: '30+ field types with validation' },
-    { title: 'Tables', href: '/docs/tables', desc: 'Sorting, filtering, and actions' },
-    { title: 'Panel', href: '/docs/panel', desc: 'Configure your admin panel' },
-    { title: 'Authentication', href: '/docs/auth', desc: 'Social login, 2FA, passkeys' },
-    { title: 'AI Integration', href: '/docs/ai', desc: 'AIAgent & global search' },
-    { title: 'Frontend', href: '/docs/frontend', desc: 'Vue components & utilities' },
+    { title: 'Schema Builder', href: '/docs/schemas/introduction', desc: '30+ field types with validation' },
+    { title: 'Tables', href: '/docs/tables/introduction', desc: 'Sorting, filtering, and actions' },
+    { title: 'Panel', href: '/docs/panel/introduction', desc: 'Configure your admin panel' },
+    { title: 'Authentication', href: '/docs/auth/introduction', desc: 'Social login, 2FA, passkeys' },
+    { title: 'AI Integration', href: '/docs/ai/introduction', desc: 'AIAgent & global search' },
+    { title: 'Frontend', href: '/docs/frontend/README', desc: 'Vue components & utilities' },
     { title: 'Brand', href: '/brand', desc: 'Logos and brand assets' },
 ]
 
@@ -526,7 +526,7 @@ onMounted(() => {
                             <p class="text-gray-400 max-w-2xl">{{ activeFeature.description }}</p>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
-                            <Link :href="`/docs/${activeFeature.id === 'resource' ? 'panel/resources' : activeFeature.id}`" class="inline-flex items-center gap-2 rounded-lg border border-[#04bdaf]/50 bg-[#04bdaf]/10 px-4 py-2 text-sm text-[#04bdaf] transition hover:bg-[#04bdaf]/20">
+                            <Link :href="`/docs/${activeFeature.id === 'resource' ? 'panel/resources' : activeFeature.id + '/introduction'}`" class="inline-flex items-center gap-2 rounded-lg border border-[#04bdaf]/50 bg-[#04bdaf]/10 px-4 py-2 text-sm text-[#04bdaf] transition hover:bg-[#04bdaf]/20">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                                 </svg>
@@ -787,10 +787,10 @@ onMounted(() => {
                         <h4 class="mb-4 font-semibold">Documentation</h4>
                         <ul class="space-y-2 text-sm text-gray-500">
                             <li><Link href="/docs/getting-started/installation" class="transition hover:text-[#04bdaf]">Installation</Link></li>
-                            <li><Link href="/docs/forms" class="transition hover:text-[#04bdaf]">Forms</Link></li>
-                            <li><Link href="/docs/tables" class="transition hover:text-[#04bdaf]">Tables</Link></li>
-                            <li><Link href="/docs/panel" class="transition hover:text-[#04bdaf]">Panel</Link></li>
-                            <li><Link href="/docs/widgets" class="transition hover:text-[#04bdaf]">Widgets</Link></li>
+                            <li><Link href="/docs/forms/introduction" class="transition hover:text-[#04bdaf]">Forms</Link></li>
+                            <li><Link href="/docs/tables/introduction" class="transition hover:text-[#04bdaf]">Tables</Link></li>
+                            <li><Link href="/docs/panel/introduction" class="transition hover:text-[#04bdaf]">Panel</Link></li>
+                            <li><Link href="/docs/widgets/introduction" class="transition hover:text-[#04bdaf]">Widgets</Link></li>
                         </ul>
                     </div>
                     <div>
@@ -799,7 +799,7 @@ onMounted(() => {
                             <li><a href="https://github.com/laravilt/laravilt" target="_blank" class="transition hover:text-[#04bdaf]">GitHub</a></li>
                             <li><a href="https://github.com/laravilt/laravilt/releases" target="_blank" class="transition hover:text-[#04bdaf]">Changelog</a></li>
                             <li><a href="https://github.com/laravilt/laravilt/issues" target="_blank" class="transition hover:text-[#04bdaf]">Issues</a></li>
-                            <li><Link href="/docs/ai" class="transition hover:text-[#04bdaf]">AI Integration</Link></li>
+                            <li><Link href="/docs/ai/introduction" class="transition hover:text-[#04bdaf]">AI Integration</Link></li>
                         </ul>
                     </div>
                     <div>
