@@ -2,6 +2,7 @@
 
 namespace App\Providers\Laravilt;
 
+use App\Models\Team;
 use Laravilt\AI\Builders\AIProviderBuilder;
 use Laravilt\AI\Builders\GlobalSearchBuilder;
 use Laravilt\AI\Enums\OpenAIModel;
@@ -28,6 +29,9 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->default()
             ->brandName("Laravilt")
+            ->tenant(Team::class, 'team', 'slug')
+            ->tenantProfile()
+            ->tenantRegistration()
             ->font(
                 GoogleFontProvider::make('IBM Plex Sans Arabic')
                     ->weights([400, 500, 600, 700])

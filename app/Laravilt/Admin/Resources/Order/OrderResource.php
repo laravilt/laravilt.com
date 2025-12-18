@@ -32,20 +32,7 @@ class OrderResource extends Resource
     protected static int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'order_number';
-
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where('status', 'pending')
-            ->count() ?: null;
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        $count = static::getModel()::where('status', 'pending')
-            ->count();
-
-        return $count > 10 ? 'danger' : ($count > 5 ? 'warning' : 'success');
-    }
+    
 
     public static function form(Schema $schema): Schema
     {

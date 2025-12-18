@@ -6,12 +6,21 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
 {
     use HasFactory, SoftDeletes;
+
+    /**
+     * Get the teams that have access to this product.
+     */
+    public function teams(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
+    }
 
     protected $fillable = [
         'user_id',
@@ -33,6 +42,7 @@ class Customer extends Model
         'total_spent',
         'orders_count',
         'last_order_at',
+        'team_id'
     ];
 
     protected $casts = [

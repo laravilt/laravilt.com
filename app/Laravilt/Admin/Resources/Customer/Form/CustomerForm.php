@@ -4,6 +4,7 @@ namespace App\Laravilt\Admin\Resources\Customer\Form;
 
 use Laravilt\Forms\Components\DatePicker;
 use Laravilt\Forms\Components\FileUpload;
+use Laravilt\Forms\Components\Hidden;
 use Laravilt\Forms\Components\Select;
 use Laravilt\Forms\Components\TextInput;
 use Laravilt\Forms\Components\Textarea;
@@ -24,6 +25,7 @@ class CustomerForm
                     ->schema([
                         Grid::make(2)
                             ->schema([
+                                Hidden::make('user_id')->default(auth()->id()),
                                 FileUpload::make('avatar')
                                     ->label('Photo')
                                     ->image()

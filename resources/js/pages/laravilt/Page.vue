@@ -102,11 +102,15 @@ const getViewStorageKey = () => {
     return `laravilt_view_${props.pageSlug || 'default'}`;
 };
 
+// Computed: Available views with proper default
+const computedAvailableViews = computed(() => {
+    return props.availableViews || ['table', 'grid'];
+});
+
 const getSavedView = (): 'table' | 'grid' | 'api' | null => {
     if (typeof window === 'undefined') return null;
     const saved = localStorage.getItem(getViewStorageKey());
-    const validViews = props.availableViews || ['table', 'grid'];
-    if (saved && validViews.includes(saved)) {
+    if (saved && computedAvailableViews.value.includes(saved)) {
         return saved as 'table' | 'grid' | 'api';
     }
     return null;
@@ -144,8 +148,7 @@ const needsViewCheck = computed(() => {
 
     // Check if saved view differs from current
     const saved = localStorage.getItem(`laravilt_view_${props.pageSlug || 'default'}`);
-    const validViews = props.availableViews || ['table', 'grid'];
-    if (saved && validViews.includes(saved)) {
+    if (saved && computedAvailableViews.value.includes(saved)) {
         return saved !== (props.currentView || 'table');
     }
 
@@ -280,6 +283,13 @@ const hasFormSchema = computed(() => {
     });
 });
 
+// Check if schema has nested wrapper objects (Schema containers with fields/schema property)
+// vs flat form components (TextInput, Checkbox, etc. directly in schema array)
+const hasNestedSchemaWrappers = computed(() => {
+    if (!props.schema || !Array.isArray(props.schema)) return false;
+    return props.schema.some((item: any) => item.fields || item.schema);
+});
+
 // Check if schema contains InfoList (View pages - should not have internal scroll)
 const hasInfoListSchema = computed(() => {
     if (!props.schema || !Array.isArray(props.schema)) return false;
@@ -358,16 +368,12 @@ const handleFormSubmit = (event: Event) => {
         return;
     }
 
-    console.log('📝 Form data collected from FormRenderer:', data);
-
     // Step 3: Add action token
     if (action.actionToken) {
         data.token = action.actionToken;
     } else {
         data.action = action.name;
     }
-
-    console.log('🔐 Data with token:', data);
 
     // Step 4: Submit via Inertia - Backend validation will run in the action closure
     router.post(action.actionUrl, data, {
@@ -377,11 +383,10 @@ const handleFormSubmit = (event: Event) => {
         },
         preserveScroll: true,
         onError: (errors) => {
-            console.error('❌ Validation errors received:', errors);
-            console.log('📄 Page props errors:', props);
+            console.error('Validation errors received:', errors);
         },
         onSuccess: () => {
-            console.log('✅ Action executed successfully');
+            // Action executed successfully
         },
     });
 };
@@ -393,8 +398,6 @@ const handlePasskeyLogin = async () => {
     }
 
     try {
-        console.log('Starting passkey login...');
-
         // Get WebAuthn assertion options from server
         const optionsResponse = await fetch(props.passkeyLoginOptionsUrl, {
             credentials: 'same-origin',
@@ -404,13 +407,10 @@ const handlePasskeyLogin = async () => {
         });
 
         if (!optionsResponse.ok) {
-            const text = await optionsResponse.text();
-            console.error('Failed to fetch options:', optionsResponse.status, text);
             throw new Error(`Failed to fetch WebAuthn options: ${optionsResponse.status}`);
         }
 
         const options = await optionsResponse.json();
-        console.log('Received WebAuthn options:', options);
 
         // Convert base64url strings to ArrayBuffer
         options.challenge = base64urlDecode(options.challenge);
@@ -422,7 +422,6 @@ const handlePasskeyLogin = async () => {
         }
 
         // Get credential using WebAuthn API
-        console.log('Calling navigator.credentials.get...');
         const credential = await navigator.credentials.get({
             publicKey: options
         }) as PublicKeyCredential;
@@ -430,8 +429,6 @@ const handlePasskeyLogin = async () => {
         if (!credential) {
             throw new Error('No credential received');
         }
-
-        console.log('Credential received:', credential.id);
 
         // Prepare assertion data for server
         const assertionResponse = credential.response as AuthenticatorAssertionResponse;
@@ -446,8 +443,6 @@ const handlePasskeyLogin = async () => {
                 userHandle: assertionResponse.userHandle ? arrayBufferToBase64url(assertionResponse.userHandle) : null
             }
         };
-
-        console.log('Sending assertion to server...');
 
         // Send assertion to server
         const response = await fetch(props.passkeyLoginUrl, {
@@ -466,7 +461,6 @@ const handlePasskeyLogin = async () => {
         }
 
         const result = await response.json();
-        console.log('Login successful:', result);
 
         // Redirect to dashboard
         if (result.redirect) {
@@ -493,8 +487,6 @@ const handleSendMagicLink = async () => {
     sendingMagicLink.value = true;
 
     try {
-        console.log('Sending magic link...');
-
         const response = await fetch(props.magicLinkSendUrl, {
             method: 'POST',
             credentials: 'same-origin',
@@ -510,15 +502,8 @@ const handleSendMagicLink = async () => {
             throw new Error(errorData.error || `Failed to send magic link: ${response.status}`);
         }
 
-        const result = await response.json();
-        console.log('Magic link sent:', result);
-
+        await response.json();
         alert('Magic link sent! Check your email.');
-
-        // If in debug mode and URL is provided, log it
-        if (result.debug_url) {
-            console.log('Debug magic link URL:', result.debug_url);
-        }
 
     } catch (error) {
         console.error('Failed to send magic link:', error);
@@ -690,7 +675,7 @@ onMounted(() => {
                         >
                             <!-- Table View Button (only if table view is available) -->
                             <button
-                                v-if="availableViews?.includes('table')"
+                                v-if="computedAvailableViews.includes('table')"
                                 type="button"
                                 @click="toggleView('table')"
                                 :class="[
@@ -711,7 +696,7 @@ onMounted(() => {
                             </button>
                             <!-- Grid View Button (only if grid view is available) -->
                             <button
-                                v-if="availableViews?.includes('grid')"
+                                v-if="computedAvailableViews.includes('grid')"
                                 type="button"
                                 @click="toggleView('grid')"
                                 :class="[
@@ -730,9 +715,9 @@ onMounted(() => {
                                     <rect x="3" y="14" width="7" height="7"/>
                                 </svg>
                             </button>
-                            <!-- API View Button (only if API view is available) -->
+                            <!-- API View Button (only if API option is available) -->
                             <button
-                                v-if="availableViews?.includes('api')"
+                                v-if="computedAvailableViews.includes('api')"
                                 type="button"
                                 @click="toggleView('api')"
                                 :class="[
@@ -997,8 +982,22 @@ onMounted(() => {
                     class="flex flex-col gap-6"
                 >
                     <ErrorProvider :errors="$page.props.errors || {}">
-                        <!-- Render Schema -->
-                        <Schema ref="formRendererRef" :schema="schema" :form-controller="formController" />
+                        <!-- Render Schema - handle both nested wrappers and flat form components -->
+                        <template v-if="hasNestedSchemaWrappers">
+                            <!-- Nested schema wrappers (e.g., RegisterTenant with Schema container) -->
+                            <template v-for="(item, index) in schema" :key="index">
+                                <Schema
+                                    v-if="item.fields || item.schema"
+                                    ref="formRendererRef"
+                                    :schema="item.schema || item.fields || []"
+                                    :form-controller="formController"
+                                />
+                            </template>
+                        </template>
+                        <template v-else>
+                            <!-- Flat form components (e.g., Login page) -->
+                            <Schema ref="formRendererRef" :schema="schema" :form-controller="formController" />
+                        </template>
 
                         <!-- Submit Actions -->
                         <div class="flex flex-col gap-4">
@@ -1006,7 +1005,7 @@ onMounted(() => {
                                 v-for="action in actionsWithUrl"
                                 :key="action.name"
                                 v-bind="action"
-                                :getFormData="() => formRendererRef?.getFormData()"
+                                :getFormData="getFormRendererData"
                             />
                         </div>
 
@@ -1087,8 +1086,14 @@ onMounted(() => {
                     class="flex flex-col gap-6"
                 >
                     <ErrorProvider :errors="errors">
-                        <!-- Render Schema -->
-                        <Schema :schema="schema" :form-controller="formController" />
+                        <!-- Render Schema - iterate over schema items and extract inner schema -->
+                        <template v-for="(item, index) in schema" :key="index">
+                            <Schema
+                                v-if="item.fields || item.schema"
+                                :schema="item.schema || item.fields || []"
+                                :form-controller="formController"
+                            />
+                        </template>
                     </ErrorProvider>
                 </Form>
 

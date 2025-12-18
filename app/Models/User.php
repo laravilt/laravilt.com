@@ -3,16 +3,22 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Concerns\HasTeams;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravilt\Auth\Concerns\LaraviltUser;
+use Laravilt\Panel\Contracts\HasDefaultTenant;
+use Laravilt\Panel\Contracts\HasTenants;
+use Laravilt\Panel\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasTenants, HasDefaultTenant
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, LaraviltUser;
+    use HasFactory, Notifiable, LaraviltUser, HasTeams;
 
     /**
      * The attributes that are mass assignable.
