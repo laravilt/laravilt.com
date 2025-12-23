@@ -127,6 +127,50 @@ class DocumentationService
     }
 
     /**
+     * Sync documentation from local filesystem.
+     */
+    public function syncFromLocal(string $localPath): array
+    {
+        $synced = [];
+        $files = $this->getLocalDocsFiles($localPath);
+
+        foreach ($files as $file) {
+            $relativePath = str_replace($localPath . '/', '', $file);
+            $relativePath = str_replace('.md', '', $relativePath);
+
+            $content = file_get_contents($file);
+            $sha = md5($content . filemtime($file));
+
+            $this->saveDocumentation($relativePath, $content, $sha);
+            $synced[] = $relativePath;
+        }
+
+        // Clear cache after sync
+        Cache::forget('docs_navigation');
+
+        return $synced;
+    }
+
+    /**
+     * Get all markdown files from local docs folder recursively.
+     */
+    protected function getLocalDocsFiles(string $path): array
+    {
+        $files = [];
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'md') {
+                $files[] = $file->getPathname();
+            }
+        }
+
+        return $files;
+    }
+
+    /**
      * Get all markdown files from GitHub docs folder.
      */
     protected function getDocsFilesFromGithub(): array
@@ -289,23 +333,60 @@ class DocumentationService
     public function getNavigation(): array
     {
         return Cache::remember('docs_navigation', 3600, function () {
-            // Define section order and display names
+            // Define section order, display names, and icons
             $sectionConfig = [
-                'getting-started' => 'Getting Started',
-                'panel' => 'Panel',
-                'forms' => 'Forms',
-                'tables' => 'Tables',
-                'infolists' => 'Infolists',
-                'actions' => 'Actions',
-                'notifications' => 'Notifications',
-                'widgets' => 'Widgets',
-                'auth' => 'Authentication',
-                'ai' => 'AI Integration',
-                'schemas' => 'Schemas',
-                'frontend' => 'Frontend',
-                'query-builder' => 'Query Builder',
-                'plugins' => 'Plugins',
-                'support' => 'Support',
+                'getting-started' => ['title' => 'Getting Started', 'icon' => 'Rocket'],
+                'panel' => ['title' => 'Panel', 'icon' => 'LayoutDashboard'],
+                'forms' => ['title' => 'Forms', 'icon' => 'FileEdit'],
+                'tables' => ['title' => 'Tables', 'icon' => 'Table'],
+                'infolists' => ['title' => 'Infolists', 'icon' => 'List'],
+                'actions' => ['title' => 'Actions', 'icon' => 'Zap'],
+                'notifications' => ['title' => 'Notifications', 'icon' => 'Bell'],
+                'widgets' => ['title' => 'Widgets', 'icon' => 'LayoutGrid'],
+                'auth' => ['title' => 'Authentication', 'icon' => 'Shield'],
+                'ai' => ['title' => 'AI Integration', 'icon' => 'Bot'],
+                'mcp' => ['title' => 'MCP Servers', 'icon' => 'Server'],
+                'schemas' => ['title' => 'Schemas', 'icon' => 'Layers'],
+                'frontend' => ['title' => 'Frontend', 'icon' => 'Monitor'],
+                'query-builder' => ['title' => 'Query Builder', 'icon' => 'Database'],
+                'plugins' => ['title' => 'Plugins', 'icon' => 'Puzzle'],
+                'support' => ['title' => 'Support', 'icon' => 'Wrench'],
+                'faq' => ['title' => 'FAQ & Help', 'icon' => 'HelpCircle'],
+            ];
+
+            // Define subsection titles for nested folders
+            $subsectionTitles = [
+                'forms/inputs' => 'Inputs',
+                'forms/selection' => 'Selection',
+                'forms/datetime' => 'Date & Time',
+                'forms/media' => 'Media',
+                'forms/validation' => 'Validation',
+                'forms/reactive' => 'Reactive',
+                'tables/columns' => 'Columns',
+                'tables/filters' => 'Filters',
+                'tables/actions' => 'Actions',
+                'tables/features' => 'Features',
+                'infolists/entries' => 'Entries',
+                'infolists/layouts' => 'Layouts',
+                'actions/types' => 'Action Types',
+                'actions/bulk' => 'Bulk Actions',
+                'schemas/components' => 'Components',
+                'widgets/types' => 'Widget Types',
+                'auth/profile' => 'Profile',
+                'ai/providers' => 'Providers',
+                'ai/chat' => 'Chat',
+                'ai/tools' => 'Tools',
+                'ai/agents' => 'Agents',
+                'plugins/components' => 'Components',
+                'plugins/manager' => 'Manager',
+                'support/concerns' => 'Concerns',
+                'frontend/ui' => 'UI Components',
+                'frontend/forms' => 'Form Components',
+                'frontend/charts' => 'Charts',
+                'notifications/types' => 'Types',
+                'query-builder/filters' => 'Filters',
+                'panel/concepts' => 'Concepts',
+                'panel/tenancy' => 'Tenancy',
             ];
 
             // Define item order within each section (introduction always first)
@@ -315,12 +396,16 @@ class DocumentationService
                 'forms' => ['introduction', 'field-types', 'validation', 'layouts', 'reactive-fields', 'custom-fields'],
                 'tables' => ['introduction', 'columns', 'filters', 'actions', 'api'],
                 'auth' => ['introduction', 'methods', 'two-factor', 'social', 'passkeys', 'profile'],
-                'frontend' => ['README', 'components', 'layouts', 'styling', 'utilities'],
+                'frontend' => ['README', 'introduction', 'components', 'layouts', 'styling', 'utilities'],
+                'mcp' => ['introduction', 'forms', 'tables', 'panel', 'auth', 'schemas', 'notifications', 'ai', 'plugins'],
+                'faq' => ['introduction', 'installation', 'forms', 'tables', 'schemas', 'widgets', 'ai', 'troubleshooting'],
             ];
 
             // Get all docs from database grouped by section
+            // Exclude README from navigation (it's the index page)
             $allDocs = Documentation::orderBy('order')
                 ->orderBy('path')
+                ->where('path', '!=', 'README')
                 ->get()
                 ->groupBy(function ($doc) {
                     $parts = explode('/', $doc->path);
@@ -330,35 +415,68 @@ class DocumentationService
             $navigation = [];
 
             // First add configured sections in order
-            foreach ($sectionConfig as $section => $title) {
+            foreach ($sectionConfig as $section => $config) {
                 if ($allDocs->has($section)) {
                     $docs = $allDocs->get($section);
 
-                    // Sort items based on predefined order if available
+                    // Group docs by subsection (e.g., forms/inputs, forms/selection)
+                    $grouped = [];
+                    $rootItems = [];
+
+                    foreach ($docs as $doc) {
+                        $relativePath = str_replace($section . '/', '', $doc->path);
+                        $parts = explode('/', $relativePath);
+
+                        if (count($parts) > 1) {
+                            // This is a nested item (e.g., forms/inputs/text-input)
+                            $subsection = $section . '/' . $parts[0];
+                            if (!isset($grouped[$subsection])) {
+                                $grouped[$subsection] = [];
+                            }
+                            $grouped[$subsection][] = [
+                                'title' => $doc->title ?? $this->pathToTitle($doc->path),
+                                'path' => $doc->path,
+                            ];
+                        } else {
+                            // This is a root level item (e.g., forms/introduction)
+                            $rootItems[] = [
+                                'title' => $doc->title ?? $this->pathToTitle($doc->path),
+                                'path' => $doc->path,
+                            ];
+                        }
+                    }
+
+                    // Sort root items based on predefined order if available
                     if (isset($itemOrder[$section])) {
                         $order = $itemOrder[$section];
-                        $docs = $docs->sort(function ($a, $b) use ($order, $section) {
-                            $aName = str_replace($section . '/', '', $a->path);
-                            $bName = str_replace($section . '/', '', $b->path);
+                        usort($rootItems, function ($a, $b) use ($order) {
+                            $aName = basename($a['path']);
+                            $bName = basename($b['path']);
                             $aIndex = array_search($aName, $order);
                             $bIndex = array_search($bName, $order);
-                            // Items not in order list go to the end
                             if ($aIndex === false) $aIndex = 999;
                             if ($bIndex === false) $bIndex = 999;
                             return $aIndex - $bIndex;
                         });
                     }
 
-                    $items = $docs->map(function ($doc) {
-                        return [
-                            'title' => $doc->title ?? $this->pathToTitle($doc->path),
-                            'path' => $doc->path,
+                    // Build items array with nested groups
+                    $items = $rootItems;
+
+                    // Add grouped subsections
+                    foreach ($grouped as $subsectionPath => $subItems) {
+                        $subsectionTitle = $subsectionTitles[$subsectionPath] ?? ucwords(str_replace(['-', '_'], ' ', basename($subsectionPath)));
+                        $items[] = [
+                            'title' => $subsectionTitle,
+                            'path' => null,
+                            'children' => $subItems,
                         ];
-                    })->values()->toArray();
+                    }
 
                     if (!empty($items)) {
                         $navigation[] = [
-                            'title' => $title,
+                            'title' => $config['title'],
+                            'icon' => $config['icon'],
                             'items' => $items,
                         ];
                     }
@@ -378,6 +496,7 @@ class DocumentationService
                     if (!empty($items)) {
                         $navigation[] = [
                             'title' => ucwords(str_replace(['-', '_'], ' ', $section)),
+                            'icon' => 'FileText',  // Default icon for dynamic sections
                             'items' => $items,
                         ];
                     }

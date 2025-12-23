@@ -46,8 +46,8 @@ class AdminPanelProvider extends PanelProvider
             ->connectedAccounts()
             ->sessionManagement()
             ->apiTokens()
-            ->databaseNotifications()
             ->localeTimezone()
+            ->databaseNotifications()
             ->twoFactor(builder: function (TwoFactorProviderBuilder $builder) {
                 $builder->provider(TotpDriver::class);
             })

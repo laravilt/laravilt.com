@@ -18,7 +18,7 @@ class DocumentationController extends Controller
 
     public function index()
     {
-        $content = $this->docs->get('getting-started/installation');
+        $content = $this->docs->get('README');
 
         // If no content exists, show a message to sync
         if (!$content) {
@@ -42,7 +42,7 @@ class DocumentationController extends Controller
         return Inertia::render('Docs/Index', [
             'navigation' => $this->docs->getNavigation(),
             'content' => $content,
-            'currentPage' => 'getting-started/installation',
+            'currentPage' => 'README',
         ]);
     }
 

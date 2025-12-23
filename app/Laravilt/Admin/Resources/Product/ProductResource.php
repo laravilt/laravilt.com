@@ -13,6 +13,8 @@ use App\Laravilt\Admin\Resources\Product\Pages\ViewProduct;
 use App\Laravilt\Admin\Resources\Product\RelationManagers\OrderItemsRelationManager;
 use App\Laravilt\Admin\Resources\Product\Table\ProductTable;
 use App\Models\Product;
+use Laravilt\AI\AIAgent;
+use Laravilt\AI\AIColumn;
 use Laravilt\Panel\Resources\Resource;
 use Laravilt\Schemas\Schema;
 use Laravilt\Tables\ApiAction;
@@ -71,6 +73,13 @@ class ProductResource extends Resource
         return [
             OrderItemsRelationManager::class,
         ];
+    }
+
+    public static function ai(AIAgent $agent): AIAgent
+    {
+        return $agent->columns([
+            AIColumn::make('name')->label('Product Name'),
+        ]);
     }
 
     /**

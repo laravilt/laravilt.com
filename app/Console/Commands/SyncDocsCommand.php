@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Cache;
 
 class SyncDocsCommand extends Command
 {
-    protected $signature = 'docs:sync {--force : Force re-sync all documentation (clears existing)}';
+    protected $signature = 'docs:sync
+        {--force : Force re-sync all documentation (clears existing)}
+        {--local : Sync from local packages/laravilt/docs folder instead of GitHub}
+        {--path= : Custom local path to sync docs from}';
 
-    protected $description = 'Sync documentation from GitHub laravilt/laravilt repository';
+    protected $description = 'Sync documentation from GitHub or local filesystem';
 
     public function handle(DocumentationService $docs): int
     {
@@ -23,9 +26,24 @@ class SyncDocsCommand extends Command
             $this->info('Cleared.');
         }
 
-        $this->info('Syncing documentation from GitHub...');
+        $synced = [];
 
-        $synced = $docs->syncFromGithub();
+        if ($this->option('local') || $this->option('path')) {
+            // Sync from local filesystem
+            $localPath = $this->option('path') ?: base_path('packages/laravilt/docs');
+
+            if (!is_dir($localPath)) {
+                $this->error("Local docs path not found: {$localPath}");
+                return Command::FAILURE;
+            }
+
+            $this->info("Syncing documentation from local: {$localPath}");
+            $synced = $docs->syncFromLocal($localPath);
+        } else {
+            // Sync from GitHub
+            $this->info('Syncing documentation from GitHub...');
+            $synced = $docs->syncFromGithub();
+        }
 
         // Clear navigation cache after sync
         Cache::forget('docs_navigation');
