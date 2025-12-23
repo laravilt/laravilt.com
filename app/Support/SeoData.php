@@ -78,7 +78,7 @@ class SeoData implements Arrayable
 
     public function getFullTitle(): string
     {
-        $siteName = config('app.name', 'Laravilt');
+        $siteName = 'Laravilt';
 
         if (empty($this->title) || $this->title === 'Home' || $this->title === $siteName) {
             return "{$siteName} - Modern Admin Panel Framework for Laravel + Vue";
@@ -124,7 +124,7 @@ class SeoData implements Arrayable
             'modifiedTime' => $this->modifiedTime,
             'section' => $this->section,
             'noindex' => $this->noindex,
-            'siteName' => config('app.name', 'Laravilt'),
+            'siteName' => 'Laravilt',
             'twitterHandle' => '@laravilt',
         ];
     }

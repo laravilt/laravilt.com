@@ -24,12 +24,7 @@ const startInstantDemo = () => {
 </script>
 
 <template>
-    <SeoHead
-        title="Try Demo"
-        description="Try Laravilt for free! Experience our modern admin panel framework with full features including forms, tables, widgets, and AI integration."
-        keywords="laravilt demo, try laravilt, admin panel demo, laravel admin demo, free demo"
-        url="/demo"
-    />
+    <SeoHead />
 
     <div class="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
         <!-- Navigation -->

@@ -39,12 +39,6 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        // Get SEO data from request attributes (set by controllers) or use defaults
-        $seo = $request->attributes->get('seo', new SeoData());
-
-        // Share SEO data with the view for server-side rendering
-        view()->share('seo', $seo->toArray());
-
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -55,7 +49,22 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'notifications' => session()->get('notifications', []),
             'actionUpdatedData' => session()->get('action_updated_data'),
-            'seo' => $seo->toArray(),
+            // Use closure for lazy evaluation - runs AFTER controller sets SEO data
+            'seo' => fn () => $this->getSeoData($request),
         ];
+    }
+
+    /**
+     * Get SEO data from request attributes (set by controllers) or use defaults.
+     * This is called lazily after the controller has run.
+     */
+    protected function getSeoData(Request $request): array
+    {
+        $seo = $request->attributes->get('seo', new SeoData());
+
+        // Share SEO data with the view for server-side rendering
+        view()->share('seo', $seo->toArray());
+
+        return $seo->toArray();
     }
 }

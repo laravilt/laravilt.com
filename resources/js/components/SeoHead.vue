@@ -2,68 +2,53 @@
 import { Head, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 
-interface Props {
-    title?: string
-    description?: string
-    keywords?: string
-    image?: string
-    url?: string
-    type?: 'website' | 'article'
-    author?: string
-    publishedTime?: string
-    modifiedTime?: string
-    section?: string
-    noindex?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    type: 'website',
-    author: 'Laravilt',
-    noindex: false,
-})
-
-// Get shared SEO data from server
+// Get shared SEO data from server (set by controllers)
 const page = usePage()
-const sharedSeo = computed(() => (page.props.seo as Record<string, any>) || {})
+const seo = computed(() => (page.props.seo as Record<string, any>) || {})
 
-const siteName = 'Laravilt'
-const twitterHandle = '@laravilt'
-
-// Use props if provided, otherwise fall back to shared SEO data
-const title = computed(() => props.title || sharedSeo.value.title || 'Home')
-const description = computed(() => props.description || sharedSeo.value.description || 'Laravilt is a modern admin panel framework for Laravel and Vue.js.')
-const keywords = computed(() => props.keywords || sharedSeo.value.keywords || 'laravel, vue, admin panel')
-const image = computed(() => props.image || sharedSeo.value.image || '/og-image.png')
-const type = computed(() => props.type || sharedSeo.value.type || 'website')
-
-const fullTitle = computed(() => {
-    if (title.value === 'Home' || title.value === siteName) {
-        return `${siteName} - Modern Admin Panel Framework for Laravel + Vue`
-    }
-    return `${title.value} | ${siteName}`
-})
-
-const canonicalUrl = computed(() => {
-    const url = props.url || sharedSeo.value.url
-    if (url) {
-        return url.startsWith('http') ? url : `${window.location.origin}${url}`
-    }
-    return typeof window !== 'undefined' ? window.location.href : ''
-})
-
-const imageUrl = computed(() => {
-    const img = image.value
-    if (img?.startsWith('http')) {
-        return img
-    }
-    return typeof window !== 'undefined' ? `${window.location.origin}${img}` : img
-})
+// Use server SEO data directly - no component props needed
+// Server-side controllers set all SEO data via SeoData class
+const fullTitle = computed(() => seo.value.fullTitle || 'Laravilt - Modern Admin Panel Framework for Laravel + Vue')
+const description = computed(() => seo.value.description || 'Laravilt is a modern admin panel framework for Laravel and Vue.js.')
+const keywords = computed(() => seo.value.keywords || 'laravel, vue, admin panel')
+const canonicalUrl = computed(() => seo.value.url || (typeof window !== 'undefined' ? window.location.href : ''))
+const imageUrl = computed(() => seo.value.image || '/screenshots/14-dashboard-widgets.png')
+const type = computed(() => seo.value.type || 'website')
+const author = computed(() => seo.value.author || 'Laravilt')
+const noindex = computed(() => seo.value.noindex || false)
+const siteName = computed(() => seo.value.siteName || 'Laravilt')
+const twitterHandle = computed(() => seo.value.twitterHandle || '@laravilt')
 </script>
 
 <template>
     <Head>
-        <!-- Title is the only thing that updates during SPA navigation -->
-        <!-- All other meta tags are rendered server-side in app.blade.php for social crawlers -->
+        <!-- Primary Meta Tags -->
         <title>{{ fullTitle }}</title>
+        <meta name="title" :content="fullTitle" />
+        <meta name="description" :content="description" />
+        <meta name="keywords" :content="keywords" />
+        <meta name="author" :content="author" />
+        <meta name="robots" :content="noindex ? 'noindex, nofollow' : 'index, follow'" />
+        <link rel="canonical" :href="canonicalUrl" />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" :content="type" />
+        <meta property="og:site_name" :content="siteName" />
+        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:title" :content="fullTitle" />
+        <meta property="og:description" :content="description" />
+        <meta property="og:image" :content="imageUrl" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="en_US" />
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" :content="twitterHandle" />
+        <meta name="twitter:creator" :content="twitterHandle" />
+        <meta name="twitter:url" :content="canonicalUrl" />
+        <meta name="twitter:title" :content="fullTitle" />
+        <meta name="twitter:description" :content="description" />
+        <meta name="twitter:image" :content="imageUrl" />
     </Head>
 </template>

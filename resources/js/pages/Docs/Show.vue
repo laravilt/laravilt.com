@@ -272,14 +272,7 @@ const isActive = (path: string) => props.currentPage === path
 </script>
 
 <template>
-    <SeoHead
-        :title="`${content.title} - Documentation`"
-        :description="content.description || `Learn about ${content.title} in the Laravilt documentation. Build beautiful admin panels with Laravel and Vue.js.`"
-        :keywords="`laravilt ${content.title?.toLowerCase()}, laravel ${content.title?.toLowerCase()}, vue admin ${content.title?.toLowerCase()}`"
-        type="article"
-        section="Documentation"
-        :url="`/docs/${currentPage}`"
-    />
+    <SeoHead />
 
     <div class="min-h-screen bg-gray-900 text-white">
         <!-- Top Navigation -->

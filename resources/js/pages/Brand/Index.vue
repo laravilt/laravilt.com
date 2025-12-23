@@ -30,12 +30,7 @@ const downloadAsset = (filename: string) => {
 </script>
 
 <template>
-    <SeoHead
-        title="Brand Assets"
-        description="Download official Laravilt brand assets including logos, icons, and color guidelines. Use these resources for your projects, articles, and presentations."
-        keywords="laravilt logo, laravilt brand, laravilt assets, laravilt icon, brand guidelines"
-        url="/brand"
-    />
+    <SeoHead />
 
     <div class="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
         <!-- Navigation -->

@@ -373,12 +373,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <SeoHead
-        title="Home"
-        description="Laravilt is a modern admin panel framework for Laravel and Vue.js. Build beautiful, type-safe admin panels with forms, tables, widgets, and AI integration."
-        keywords="laravel admin panel, vue admin, crud generator, laravel forms, laravel tables, typescript admin, inertia admin panel, laravel vue dashboard"
-        url="/"
-    />
+    <SeoHead />
 
     <div class="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
         <!-- Navigation -->

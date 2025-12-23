@@ -265,14 +265,7 @@ const isActive = (path: string) => props.currentPage === path
 </script>
 
 <template>
-    <SeoHead
-        :title="content.title || 'Documentation'"
-        :description="content.description || 'Official documentation for Laravilt - a modern admin panel framework for Laravel and Vue.js. Learn how to build beautiful admin panels with forms, tables, and widgets.'"
-        keywords="laravilt docs, laravel admin documentation, vue admin tutorial, crud documentation, laravel forms guide"
-        type="article"
-        section="Documentation"
-        url="/docs"
-    />
+    <SeoHead />
 
     <div class="min-h-screen bg-gray-900 text-white">
         <!-- Top Navigation -->

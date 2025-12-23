@@ -5,17 +5,26 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-F2V7GXGK4X"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-F2V7GXGK4X');
+        </script>
+
         {{-- SEO Meta Tags (Server-side rendered for social sharing) --}}
         @php
             $seoData = $seo ?? [
-                'fullTitle' => config('app.name', 'Laravilt') . ' - Modern Admin Panel Framework for Laravel + Vue',
+                'fullTitle' => 'Laravilt - Modern Admin Panel Framework for Laravel + Vue',
                 'description' => 'Laravilt is a modern admin panel framework for Laravel and Vue.js. Build beautiful, type-safe admin panels with forms, tables, widgets, and AI integration.',
                 'keywords' => 'laravel, vue, admin panel, crud, forms, tables, typescript, inertia, filament alternative',
                 'image' => url('/screenshots/14-dashboard-widgets.png'),
                 'url' => url()->current(),
                 'type' => 'website',
                 'author' => 'Laravilt',
-                'siteName' => config('app.name', 'Laravilt'),
+                'siteName' => 'Laravilt',
                 'twitterHandle' => '@laravilt',
                 'noindex' => false,
                 'publishedTime' => null,
