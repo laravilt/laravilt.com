@@ -16,7 +16,7 @@ import { Link } from '@inertiajs/vue3'
                 <div class="hidden items-center gap-1 md:flex">
                     <Link href="/docs" class="rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:text-white">Documentation</Link>
                     <a href="https://github.com/laravilt/laravilt" target="_blank" class="rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:text-white">GitHub</a>
-                    <a href="https://discord.gg/laravilt" target="_blank" class="rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:text-white">Community</a>
+                    <a href="https://discord.gg/gyRhbVUXEZ" target="_blank" class="rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:text-white">Community</a>
                 </div>
             </div>
             <div class="flex items-center gap-3">
