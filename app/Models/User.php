@@ -9,17 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Laravilt\Auth\Concerns\LaraviltUser;
 use Laravilt\Panel\Contracts\HasDefaultTenant;
 use Laravilt\Panel\Contracts\HasTenants;
-use Laravilt\Panel\Panel;
 
-class User extends Authenticatable implements HasTenants, HasDefaultTenant
+class User extends Authenticatable implements HasDefaultTenant, HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, LaraviltUser, HasTeams;
+    use HasFactory, HasTeams, LaraviltUser, Notifiable;
 
     /**
      * The "booted" method of the model.
@@ -43,7 +41,7 @@ class User extends Authenticatable implements HasTenants, HasDefaultTenant
                 [
                     'title' => '👋 New User Registered!',
                     'description' => "Welcome **{$this->name}** to Laravilt Demo!",
-                    'color' => 0x04bdaf,
+                    'color' => 0x04BDAF,
                     'fields' => [
                         [
                             'name' => 'Email',
@@ -116,9 +114,10 @@ class User extends Authenticatable implements HasTenants, HasDefaultTenant
      */
     public function isDemoExpired(): bool
     {
-        if (!$this->is_demo || !$this->demo_expires_at) {
+        if (! $this->is_demo || ! $this->demo_expires_at) {
             return false;
         }
+
         return $this->demo_expires_at->isPast();
     }
 
