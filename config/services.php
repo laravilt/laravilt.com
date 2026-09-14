@@ -35,6 +35,10 @@ return [
         ],
     ],
 
+    'discord' => [
+        'new_user_webhook' => env('DISCORD_NEW_USER_WEBHOOK_URL'),
+    ],
+
     'github' => [
         'client_id' => env('GITHUB_CLIENT_ID'),
         'client_secret' => env('GITHUB_CLIENT_SECRET'),

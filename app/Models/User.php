@@ -34,7 +34,11 @@ class User extends Authenticatable implements HasDefaultTenant, HasTenants
      */
     public function notifyDiscordNewUser(): void
     {
-        $webhookUrl = '***REMOVED***';
+        $webhookUrl = config('services.discord.new_user_webhook');
+
+        if (blank($webhookUrl)) {
+            return;
+        }
 
         Http::post($webhookUrl, [
             'embeds' => [
