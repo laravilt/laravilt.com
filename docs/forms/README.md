@@ -9,7 +9,7 @@ Laravilt Forms provides a powerful form builder with over 30 field types.
 
 ## Available Fields
 
-- **Text Inputs**: TextInput, Textarea, RichEditor, MarkdownEditor
+- **Text Inputs**: TextInput, Textarea, [TranslatableInput](inputs/translatable-input.md), RichEditor, MarkdownEditor
 - **Selection**: Select, Radio, Checkbox, Toggle, CheckboxList
 - **Date & Time**: DatePicker, TimePicker, DateTimePicker
 - **Files**: FileUpload, ImageUpload
