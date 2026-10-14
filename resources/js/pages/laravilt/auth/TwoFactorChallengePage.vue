@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import CardLayout from '@laravilt/panel/layouts/CardLayout.vue';
 import Form from '@laravilt/forms/components/Form.vue';
 import ErrorProvider from '@laravilt/forms/components/ErrorProvider.vue';
-import ActionButton from '@laravilt/actions/components/ActionButton.vue';
 import { useNotification } from '@laravilt/notifications/app.ts';
 import { Hash, Fingerprint, Mail, KeyRound } from 'lucide-vue-next';
 import { useLocalization } from '@laravilt/support/composables';
@@ -41,7 +40,7 @@ const sendingMagicLink = ref(false);
 const resendingCode = ref(false);
 const { notify } = useNotification();
 const formRendererRef = ref<InstanceType<typeof Form> | null>(null);
-const page = usePage();
+const inertiaPage = usePage();
 const processing = ref(false);
 
 // Handle continue button click
@@ -211,7 +210,7 @@ const handlePasskeyLogin = async () => {
             throw new Error(`Login failed: ${response.status}`);
         }
 
-        const result = await response.json();
+        await response.json();
 
         if (result.redirect) {
             window.location.href = result.redirect;
@@ -250,7 +249,7 @@ const handleSendMagicLink = async () => {
             throw new Error(errorData.error || 'Failed to send magic link');
         }
 
-        const result = await response.json();
+        await response.json();
         notify({
             type: 'success',
             message: trans('laravilt-auth::auth.two_factor_challenge.magic_link_sent'),
@@ -291,7 +290,7 @@ const handleResendCode = async () => {
             throw new Error(errorData.error || trans('laravilt-auth::auth.two_factor_challenge.resend_error'));
         }
 
-        const result = await response.json();
+        await response.json();
         notify({
             type: 'success',
             message: trans('laravilt-auth::auth.two_factor_challenge.code_resent'),
@@ -411,7 +410,7 @@ function arrayBufferToBase64url(buffer: ArrayBuffer): string {
                     @submit="handleFormSubmit"
                     class="flex flex-col gap-4"
                 >
-                    <ErrorProvider :errors="page.props.errors || {}">
+                    <ErrorProvider :errors="inertiaPage.props.errors || {}">
                         <Form ref="formRendererRef" :schema="schema" />
 
                         <Button

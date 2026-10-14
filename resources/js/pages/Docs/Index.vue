@@ -267,11 +267,6 @@ watch(() => props.content, () => {
     })
 })
 
-const toggleSidebar = () => {
-    sidebarCollapsed.value = !sidebarCollapsed.value
-    localStorage.setItem('docs-sidebar-collapsed', String(sidebarCollapsed.value))
-}
-
 const addCodeBlockButtons = () => {
     document.querySelectorAll('pre').forEach((pre) => {
         if (pre.parentElement?.classList.contains('code-block-wrapper')) return

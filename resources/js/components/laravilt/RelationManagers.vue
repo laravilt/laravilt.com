@@ -2,9 +2,7 @@
 import { ref, computed } from 'vue'
 import * as LucideIcons from 'lucide-vue-next'
 import RelationManager from './RelationManager.vue'
-import { useLocalization } from '@laravilt/support/composables'
 
-const { trans } = useLocalization()
 
 // Function to get Lucide icon component by name
 const getIconComponent = (iconName: string | null | undefined) => {

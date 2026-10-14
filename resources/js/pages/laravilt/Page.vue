@@ -9,7 +9,7 @@ import SocialLogin from '@laravilt/auth/components/SocialLogin.vue';
 import OtpResendHook from '@laravilt/auth/components/OtpResendHook.vue';
 import RelationManagers from '@laravilt/panel/components/RelationManagers.vue';
 import { useLocalization } from '@laravilt/support/composables';
-import { computed, onMounted, ref, markRaw, watch } from 'vue';
+import { computed, onMounted, ref, markRaw } from 'vue';
 
 const { trans } = useLocalization();
 import CardLayout from '@laravilt/panel/layouts/CardLayout.vue';
@@ -176,7 +176,6 @@ const checkSavedViewPreference = () => {
 };
 
 const contentRef = ref<HTMLElement | null>(null);
-const vueApps = ref<any[]>([]);
 const formRendererRef = ref<any>(null);
 
 // Page loading state for smooth transitions
@@ -619,7 +618,7 @@ onMounted(() => {
                             v-else
                             :action="computedFormAction"
                             :method="formMethod"
-                            #default="{ errors, processing }"
+                            #default="{ errors }"
                             class="space-y-6"
                         >
                             <ErrorProvider :errors="errors">
@@ -1082,7 +1081,7 @@ onMounted(() => {
                     v-else
                     :action="computedFormAction"
                     :method="formMethod"
-                    #default="{ errors, processing }"
+                    #default="{ errors }"
                     class="flex flex-col gap-6"
                 >
                     <ErrorProvider :errors="errors">

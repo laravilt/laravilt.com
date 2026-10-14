@@ -38,21 +38,21 @@ createInertiaApp({
                 `./pages/${name}.vue`,
                 appPages,
             );
-        } catch (e) {
+        } catch {
             // If not found in app pages, try panel pages
             try {
                 return await resolvePageComponent(
                     `../../vendor/laravilt/panel/resources/js/pages/${name}.vue`,
                     panelPages,
                 );
-            } catch (e2) {
+            } catch {
                try {
                    // If not found in panel pages, try auth pages
                    return await resolvePageComponent(
                        `../../vendor/laravilt/auth/resources/js/Pages/${name}.vue`,
                        authPages,
                    );
-               } catch (e3) {
+               } catch {
                    // If not found in auth pages, try ai pages
                    return await resolvePageComponent(
                        `../../vendor/laravilt/ai/resources/js/Pages/${name}.vue`,
