@@ -30,3 +30,13 @@ Route::get('/docs/search', [DocumentationController::class, 'search'])->name('do
 Route::get('/docs/{page}', [DocumentationController::class, 'show'])
     ->where('page', '.*')
     ->name('docs.show');
+
+// Legacy starter-kit auth pages: authentication lives in the Laravilt panel.
+// GET only, so Fortify's POST endpoints on the same URIs keep working.
+Route::get('/login', fn () => redirect('/admin/login'))->name('login');
+Route::get('/register', fn () => redirect('/admin/login'))->name('register');
+Route::get('/forgot-password', fn () => redirect('/admin/login'))->name('password.request');
+Route::get('/reset-password/{token?}', fn () => redirect('/admin/login'))->name('password.reset');
+Route::get('/email/verify', fn () => redirect('/admin/login'))->name('verification.notice');
+Route::get('/two-factor-challenge', fn () => redirect('/admin/login'))->name('two-factor.login');
+Route::get('/user/confirm-password', fn () => redirect('/admin/login'))->name('password.confirm');
