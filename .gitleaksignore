@@ -1,0 +1,4 @@
+# Known historical findings (laravilt.com#1). The webhooks were removed from the
+# tree in #2 and must be revoked in Discord; history was not rewritten.
+5b6dc321ed0e580be0f2b550d1e8b16b6ae730aa:app/Models/User.php:discord-webhook-url:37
+b0cde208456268c95fed7f88bb4c6861e0efacbb:app/Models/User.php:discord-webhook-url:39
