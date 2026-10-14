@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import Table from '@laravilt/tables/components/Table.vue'
 import ActionButton from '@laravilt/actions/components/ActionButton.vue'
 import * as LucideIcons from 'lucide-vue-next'

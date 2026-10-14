@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { Search, Loader2, X, Sparkles, ArrowRight, Command, FileText, Users, Package, Settings, Database } from 'lucide-vue-next'
+import { Search, Loader2, X, Sparkles, ArrowRight, Command, Database } from 'lucide-vue-next'
 import { usePage } from '@inertiajs/vue3'
 import * as LucideIcons from 'lucide-vue-next'
 import { useLocalization } from '@laravilt/support/composables'
@@ -222,15 +222,6 @@ onUnmounted(() => {
   document.removeEventListener('keydown', handleGlobalKeydown, true)
 })
 
-// Map of resource icons with fallback
-const resourceIconMap: Record<string, string> = {
-  'users': 'Users',
-  'products': 'Package',
-  'settings': 'Settings',
-  'documents': 'FileText',
-  'files': 'FileText',
-}
-
 // Get icon component for a group
 function getIconComponent(iconName?: string): any {
   if (!iconName) return Database
@@ -262,19 +253,6 @@ function getIconComponent(iconName?: string): any {
   }
 
   return Database
-}
-
-// Get icon color class for a group (for variety)
-function getIconColorClass(index: number): string {
-  const colors = [
-    'bg-blue-500/10 text-blue-500 dark:bg-blue-500/20 dark:text-blue-400',
-    'bg-purple-500/10 text-purple-500 dark:bg-purple-500/20 dark:text-purple-400',
-    'bg-green-500/10 text-green-500 dark:bg-green-500/20 dark:text-green-400',
-    'bg-orange-500/10 text-orange-500 dark:bg-orange-500/20 dark:text-orange-400',
-    'bg-pink-500/10 text-pink-500 dark:bg-pink-500/20 dark:text-pink-400',
-    'bg-cyan-500/10 text-cyan-500 dark:bg-cyan-500/20 dark:text-cyan-400',
-  ]
-  return colors[index % colors.length]
 }
 
 defineExpose({ open, close })
@@ -383,7 +361,7 @@ defineExpose({ open, close })
 
             <!-- Results - shadcn style -->
             <div v-if="results.length > 0" class="max-h-[50vh] overflow-y-auto overscroll-contain px-3 py-3">
-              <div v-for="(group, groupIndex) in results" :key="group.resource" class="mb-4 last:mb-0">
+              <div v-for="group in results" :key="group.resource" class="mb-4 last:mb-0">
                 <!-- Group Header -->
                 <h3
                   class="mb-2 flex items-center gap-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
@@ -394,7 +372,7 @@ defineExpose({ open, close })
 
                 <!-- Results List -->
                 <ul class="space-y-1">
-                  <li v-for="(result, idx) in group.results" :key="result.id">
+                  <li v-for="result in group.results" :key="result.id">
                     <button
                       type="button"
                       class="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all duration-150"

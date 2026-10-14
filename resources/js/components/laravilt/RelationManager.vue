@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
 import Table from '@laravilt/tables/components/Table.vue'
 import ActionButton from '@laravilt/actions/components/ActionButton.vue'
 import { useLocalization } from '@laravilt/support/composables'

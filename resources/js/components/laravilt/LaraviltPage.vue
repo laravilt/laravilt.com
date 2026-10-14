@@ -17,7 +17,7 @@ interface Props {
     }
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 })
 </script>

@@ -47,20 +47,18 @@
 </template>
 
 <script setup lang="ts">
-import { useSlots } from 'vue'
 import AppShell from '@/components/AppShell.vue'
 import AppContent from '@/components/AppContent.vue'
 import AppSidebarHeader from '@/components/AppSidebarHeader.vue'
 import PanelSidebar from './PanelSidebar.vue'
 
-const slots = useSlots()
 
 interface BreadcrumbItem {
     title: string
     href: string
 }
 
-const props = defineProps<{
+defineProps<{
     breadcrumbs?: BreadcrumbItem[]
     heading?: string
     subheading?: string | null
