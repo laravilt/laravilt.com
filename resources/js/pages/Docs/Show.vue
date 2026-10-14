@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3'
-import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import SeoHead from '@/components/SeoHead.vue'
 import AppHeader from '@/components/shared/AppHeader.vue'
 import hljs from 'highlight.js/lib/core'
@@ -230,11 +230,6 @@ const toggleSection = (sectionTitle: string) => {
 }
 
 const isSectionExpanded = (sectionTitle: string) => expandedSection.value === sectionTitle
-
-const toggleSidebar = () => {
-    sidebarCollapsed.value = !sidebarCollapsed.value
-    localStorage.setItem('docs-sidebar-collapsed', String(sidebarCollapsed.value))
-}
 
 const addCodeBlockButtons = () => {
     document.querySelectorAll('pre').forEach((pre) => {
@@ -520,7 +515,6 @@ const shareOnFacebook = () => {
 
 const shareOnLinkedIn = () => {
     const url = encodeURIComponent(getShareUrl())
-    const title = encodeURIComponent(props.content.title)
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=400')
 }
 

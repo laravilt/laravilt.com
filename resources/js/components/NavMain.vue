@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
     SidebarGroup,
-    SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -123,7 +122,7 @@ onMounted(() => {
     if (saved) {
         try {
             openGroups.value = JSON.parse(saved);
-        } catch (e) {
+        } catch {
             // Ignore parse errors
         }
     }

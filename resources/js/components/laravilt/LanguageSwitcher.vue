@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Globe, Check } from 'lucide-vue-next';
+import { Check } from 'lucide-vue-next';
 import { useLocalization } from '@/composables/useLocalization';
 
 interface Locale {
@@ -32,7 +32,6 @@ const page = usePage<{
 const availableLocales = computed(() => page.props?.panel?.availableLocales || []);
 const currentLocale = computed(() => page.props?.panel?.currentLocale || 'en');
 const panelPath = computed(() => page.props?.panel?.path || '');
-const panelId = computed(() => page.props?.panel?.id || 'admin');
 
 const currentLocaleData = computed(() => {
     return availableLocales.value.find(l => l.value === currentLocale.value) || {

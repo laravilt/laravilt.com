@@ -13,7 +13,7 @@ interface Translations {
 }
 
 // Global translations cache
-let translationsCache: Record<string, Translations> = {};
+const translationsCache: Record<string, Translations> = {};
 
 /**
  * Get value from object - supports both flat keys and nested paths

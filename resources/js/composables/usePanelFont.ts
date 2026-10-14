@@ -72,7 +72,7 @@ export function initializePanelFont(): void {
                 loadFontStylesheet(font.url, font.family);
                 applyFontFamily(font.family);
             }
-        } catch (e) {
+        } catch {
             // Ignore parsing errors
         }
     }

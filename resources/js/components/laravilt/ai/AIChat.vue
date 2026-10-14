@@ -16,7 +16,6 @@ import {
   PanelLeftClose,
   PanelLeft,
   MoreHorizontal,
-  Pencil,
   MessageSquare,
   Database,
   AtSign,
@@ -284,73 +283,6 @@ async function deleteSession(sessionId: string) {
   }
 }
 
-// Send message
-async function sendMessage() {
-  if (!canSend.value) return
-
-  const userMessage: Message = {
-    role: 'user',
-    content: input.value.trim(),
-    timestamp: Date.now(),
-  }
-
-  messages.value.push(userMessage)
-  const userInput = input.value
-  input.value = ''
-  loading.value = true
-
-  // Reset textarea height
-  if (inputRef.value?.el?.value) {
-    inputRef.value.el.value.style.height = 'auto'
-  }
-
-  await nextTick()
-  scrollToBottom()
-
-  try {
-    const response = await fetch(`${props.endpoint}/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': csrfToken.value,
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify({
-        messages: messages.value.map((m) => ({ role: m.role, content: m.content })),
-        provider: selectedProvider.value,
-        model: selectedModel.value,
-        session_id: currentSession.value?.id,
-      }),
-    })
-
-    const data = await response.json()
-
-    messages.value.push({
-      role: 'assistant',
-      content: data.content,
-      timestamp: Date.now(),
-    })
-
-    // Refresh sessions list to show updated titles
-    if (props.showSidebar) {
-      await loadSessions()
-    }
-  } catch (error) {
-    console.error('Failed to send message:', error)
-    messages.value.push({
-      role: 'assistant',
-      content: trans('laravilt-ai::ai.chat.error'),
-      timestamp: Date.now(),
-    })
-  } finally {
-    loading.value = false
-    await nextTick()
-    scrollToBottom()
-    inputRef.value?.focus()
-  }
-}
-
 // Stream message
 async function streamMessage() {
   if (!canSend.value) return
@@ -468,7 +400,7 @@ async function streamMessage() {
                 await nextTick()
                 scrollToBottom()
               }
-            } catch (parseError) {
+            } catch {
               // Ignore parsing errors for incomplete chunks
               console.debug('Parse error (may be incomplete):', data)
             }
